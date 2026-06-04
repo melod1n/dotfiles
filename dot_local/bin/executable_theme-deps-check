@@ -2,15 +2,17 @@
 set -u
 
 DOT_NOTIFY="$HOME/.local/bin/dot-notify"
+OS="$(uname -s 2>/dev/null || echo unknown)"
 
 missing=()
+optional=()
 
 need_cmd() {
   local cmd="$1"
   local pkg="$2"
 
   if ! command -v "$cmd" >/dev/null 2>&1; then
-    missing+=("$cmd  ← пакет: $pkg")
+    missing+=("$cmd  ← $pkg")
   fi
 }
 
@@ -19,53 +21,89 @@ need_path() {
   local pkg="$2"
 
   if [[ ! -e "$path" ]]; then
-    missing+=("$path  ← пакет: $pkg")
+    missing+=("$path  ← $pkg")
   fi
 }
 
-need_cmd darkman darkman
-need_cmd notify-send libnotify
-need_cmd gsettings glib2
-need_cmd kwriteconfig6 kconfig
-need_cmd dbus-send dbus
-need_cmd kbuildsycoca6 kservice
-need_cmd hyprctl hyprland
+case "$OS" in
+  Linux)
+    need_cmd darkman "pacman: darkman"
+    need_cmd notify-send "pacman: libnotify"
+    need_cmd gsettings "pacman: glib2"
+    need_cmd kwriteconfig6 "pacman: kconfig"
+    need_cmd dbus-send "pacman: dbus"
+    need_cmd kbuildsycoca6 "pacman: kservice"
+    need_cmd hyprctl "pacman: hyprland"
 
-need_path /usr/share/color-schemes/BreezeDark.colors breeze
-need_path /usr/share/color-schemes/BreezeLight.colors breeze
-need_path /usr/share/icons/breeze breeze-icons
-need_path /usr/share/icons/breeze-dark breeze-icons
-need_path /usr/share/themes/Breeze breeze-gtk
-need_path /usr/share/themes/Breeze-Dark breeze-gtk
-need_path /etc/xdg/menus archlinux-xdg-menu
+    need_path /usr/share/color-schemes/BreezeDark.colors "pacman: breeze"
+    need_path /usr/share/color-schemes/BreezeLight.colors "pacman: breeze"
+    need_path /usr/share/icons/breeze "pacman: breeze-icons"
+    need_path /usr/share/icons/breeze-dark "pacman: breeze-icons"
+    need_path /usr/share/themes/Breeze "pacman: breeze-gtk"
+    need_path /usr/share/themes/Breeze-Dark "pacman: breeze-gtk"
+    need_path /etc/xdg/menus "pacman: archlinux-xdg-menu"
 
-if command -v pacman >/dev/null 2>&1; then
-  if ! pacman -Qq hyprqt6engine >/dev/null 2>&1; then
-    missing+=("hyprqt6engine  ← AUR: hyprqt6engine")
-  fi
+    if command -v pacman >/dev/null 2>&1; then
+      pacman -Qq hyprqt6engine >/dev/null 2>&1 || missing+=("hyprqt6engine  ← AUR: hyprqt6engine")
+      pacman -Qq xdg-desktop-portal >/dev/null 2>&1 || missing+=("xdg-desktop-portal  ← pacman: xdg-desktop-portal")
+      pacman -Qq xdg-desktop-portal-hyprland >/dev/null 2>&1 || missing+=("xdg-desktop-portal-hyprland  ← pacman: xdg-desktop-portal-hyprland")
+    fi
+    ;;
 
-  if ! pacman -Qq xdg-desktop-portal >/dev/null 2>&1; then
-    missing+=("xdg-desktop-portal  ← пакет: xdg-desktop-portal")
-  fi
+  Darwin)
+    need_cmd osascript "built-in macOS tool"
+    need_cmd defaults "built-in macOS tool"
 
-  if ! pacman -Qq xdg-desktop-portal-hyprland >/dev/null 2>&1; then
-    missing+=("xdg-desktop-portal-hyprland  ← пакет: xdg-desktop-portal-hyprland")
-  fi
-fi
+    if ! command -v terminal-notifier >/dev/null 2>&1; then
+      optional+=("terminal-notifier  ← optional: brew install terminal-notifier")
+    fi
+    ;;
+
+  *)
+    missing+=("Unsupported OS: $OS")
+    ;;
+esac
 
 if ((${#missing[@]} > 0)); then
-  body="Не хватает компонентов:
-
-$(printf '• %s\n' "${missing[@]}")
-
-Официальные пакеты:
+  case "$OS" in
+    Linux)
+      install_hint="Официальные пакеты:
 sudo pacman -S --needed darkman libnotify kconfig kservice dbus glib2 gsettings-desktop-schemas breeze breeze-icons breeze-gtk xdg-desktop-portal xdg-desktop-portal-hyprland archlinux-xdg-menu
 
 AUR:
 yay -S --needed hyprqt6engine"
+      ;;
+    Darwin)
+      install_hint="macOS:
+brew install terminal-notifier
+
+Если отсутствуют osascript/defaults — что-то сильно сломано в системе."
+      ;;
+    *)
+      install_hint="No install hint for OS: $OS"
+      ;;
+  esac
+
+  body="Не хватает компонентов:
+
+$(printf '• %s\n' "${missing[@]}")
+
+$install_hint"
 
   if [[ -x "$DOT_NOTIFY" ]]; then
     "$DOT_NOTIFY" important "Theme setup incomplete" "$body" || true
+  else
+    printf '%s\n' "$body" >&2
+  fi
+fi
+
+if [[ "${DOT_SHOW_OPTIONAL_DEPS:-0}" == "1" && ${#optional[@]} -gt 0 ]]; then
+  body="Опциональные компоненты:
+
+$(printf '• %s\n' "${optional[@]}")"
+
+  if [[ -x "$DOT_NOTIFY" ]]; then
+    "$DOT_NOTIFY" normal "Optional dependencies" "$body" || true
   else
     printf '%s\n' "$body" >&2
   fi

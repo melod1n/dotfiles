@@ -2,27 +2,12 @@
 set -euo pipefail
 
 DOT_NOTIFY="$HOME/.local/bin/dot-notify"
+OS="$(uname -s 2>/dev/null || echo unknown)"
 
 MODE="${1:-}"
 
 case "$MODE" in
-  dark)
-    QT_SCHEME="/usr/share/color-schemes/BreezeDark.colors"
-    KDE_SCHEME="BreezeDark"
-    DOLPHIN_SCHEME="Breeze Dark"
-    ICON_THEME="breeze-dark"
-    GTK_THEME="Breeze-Dark"
-    GTK_COLOR_SCHEME="prefer-dark"
-    GTK_DARK="1"
-    ;;
-  light)
-    QT_SCHEME="/usr/share/color-schemes/BreezeLight.colors"
-    KDE_SCHEME="BreezeLight"
-    DOLPHIN_SCHEME="Breeze Light"
-    ICON_THEME="breeze"
-    GTK_THEME="Breeze"
-    GTK_COLOR_SCHEME="prefer-light"
-    GTK_DARK="0"
+  dark|light)
     ;;
   *)
     echo "Usage: apply-theme dark|light" >&2
@@ -30,17 +15,49 @@ case "$MODE" in
     ;;
 esac
 
+notify_theme() {
+  if [[ "${DOT_THEME_NOTIFY:-1}" != "0" && -x "$DOT_NOTIFY" ]]; then
+    "$DOT_NOTIFY" theme "Theme switched" "$MODE mode" || true
+  fi
+}
+
 if [[ -x "$HOME/.local/bin/theme-deps-check" ]]; then
   "$HOME/.local/bin/theme-deps-check" || true
 fi
 
-mkdir -p \
-  "$HOME/.config/hypr" \
-  "$HOME/.config/gtk-3.0" \
-  "$HOME/.config/gtk-4.0" \
-  "$HOME/.local/state"
+mkdir -p "$HOME/.local/state"
+echo "$MODE" > "$HOME/.local/state/theme-mode"
 
-cat > "$HOME/.config/hypr/hyprqt6engine.conf" <<EOF2
+apply_linux() {
+  local QT_SCHEME KDE_SCHEME DOLPHIN_SCHEME ICON_THEME GTK_THEME GTK_COLOR_SCHEME GTK_DARK
+
+  case "$MODE" in
+    dark)
+      QT_SCHEME="/usr/share/color-schemes/BreezeDark.colors"
+      KDE_SCHEME="BreezeDark"
+      DOLPHIN_SCHEME="Breeze Dark"
+      ICON_THEME="breeze-dark"
+      GTK_THEME="Breeze-Dark"
+      GTK_COLOR_SCHEME="prefer-dark"
+      GTK_DARK="1"
+      ;;
+    light)
+      QT_SCHEME="/usr/share/color-schemes/BreezeLight.colors"
+      KDE_SCHEME="BreezeLight"
+      DOLPHIN_SCHEME="Breeze Light"
+      ICON_THEME="breeze"
+      GTK_THEME="Breeze"
+      GTK_COLOR_SCHEME="prefer-light"
+      GTK_DARK="0"
+      ;;
+  esac
+
+  mkdir -p \
+    "$HOME/.config/hypr" \
+    "$HOME/.config/gtk-3.0" \
+    "$HOME/.config/gtk-4.0"
+
+  cat > "$HOME/.config/hypr/hyprqt6engine.conf" <<EOF2
 theme {
     color_scheme = $QT_SCHEME
     icon_theme = $ICON_THEME
@@ -58,44 +75,79 @@ misc {
 }
 EOF2
 
-if command -v kwriteconfig6 >/dev/null 2>&1; then
-  kwriteconfig6 --file kdeglobals --group General --key ColorScheme "$KDE_SCHEME"
-  kwriteconfig6 --file kdeglobals --group Icons --key Theme "$ICON_THEME"
-  kwriteconfig6 --file kdeglobals --group KDE --key widgetStyle Breeze
-  kwriteconfig6 --file dolphinrc --group UiSettings --key ColorScheme "$DOLPHIN_SCHEME"
-fi
+  if command -v kwriteconfig6 >/dev/null 2>&1; then
+    kwriteconfig6 --file kdeglobals --group General --key ColorScheme "$KDE_SCHEME"
+    kwriteconfig6 --file kdeglobals --group Icons --key Theme "$ICON_THEME"
+    kwriteconfig6 --file kdeglobals --group KDE --key widgetStyle Breeze
+    kwriteconfig6 --file dolphinrc --group UiSettings --key ColorScheme "$DOLPHIN_SCHEME"
+  fi
 
-if command -v gsettings >/dev/null 2>&1; then
-  gsettings set org.gnome.desktop.interface color-scheme "$GTK_COLOR_SCHEME" || true
-  gsettings set org.gnome.desktop.interface gtk-theme "$GTK_THEME" || true
-  gsettings set org.gnome.desktop.interface icon-theme "$ICON_THEME" || true
-fi
+  if command -v gsettings >/dev/null 2>&1; then
+    gsettings set org.gnome.desktop.interface color-scheme "$GTK_COLOR_SCHEME" || true
+    gsettings set org.gnome.desktop.interface gtk-theme "$GTK_THEME" || true
+    gsettings set org.gnome.desktop.interface icon-theme "$ICON_THEME" || true
+  fi
 
-cat > "$HOME/.config/gtk-3.0/settings.ini" <<EOF2
+  cat > "$HOME/.config/gtk-3.0/settings.ini" <<EOF2
 [Settings]
 gtk-theme-name=$GTK_THEME
 gtk-icon-theme-name=$ICON_THEME
 gtk-application-prefer-dark-theme=$GTK_DARK
 EOF2
 
-cat > "$HOME/.config/gtk-4.0/settings.ini" <<EOF2
+  cat > "$HOME/.config/gtk-4.0/settings.ini" <<EOF2
 [Settings]
 gtk-theme-name=$GTK_THEME
 gtk-icon-theme-name=$ICON_THEME
 gtk-application-prefer-dark-theme=$GTK_DARK
 EOF2
 
-echo "$MODE" > "$HOME/.local/state/theme-mode"
+  dbus-send --session --type=signal /KGlobalSettings org.kde.KGlobalSettings.notifyChange int32:0 int32:0 2>/dev/null || true
+  dbus-send --session --type=signal /KGlobalSettings org.kde.KGlobalSettings.notifyChange int32:2 int32:0 2>/dev/null || true
 
-dbus-send --session --type=signal /KGlobalSettings org.kde.KGlobalSettings.notifyChange int32:0 int32:0 2>/dev/null || true
-dbus-send --session --type=signal /KGlobalSettings org.kde.KGlobalSettings.notifyChange int32:2 int32:0 2>/dev/null || true
+  if pgrep -x dolphin >/dev/null 2>&1; then
+    pkill -x dolphin || true
+  fi
+}
 
-# Dolphin вне Plasma плохо обновляет тему на лету.
-# Новый запуск будет уже с актуальной темой.
-if pgrep -x dolphin >/dev/null 2>&1; then
-  pkill -x dolphin || true
-fi
+apply_macos() {
+  local apple_bool
 
-if [[ "${DOT_THEME_NOTIFY:-1}" != "0" && -x "$DOT_NOTIFY" ]]; then
-  "$DOT_NOTIFY" theme "Theme switched" "$MODE mode" || true
-fi
+  case "$MODE" in
+    dark) apple_bool="true" ;;
+    light) apple_bool="false" ;;
+  esac
+
+  if ! command -v osascript >/dev/null 2>&1; then
+    if [[ -x "$DOT_NOTIFY" ]]; then
+      "$DOT_NOTIFY" error "Theme switch failed" "osascript is missing"
+    fi
+    exit 1
+  fi
+
+  if ! osascript -e "tell application \"System Events\" to tell appearance preferences to set dark mode to $apple_bool" >/dev/null; then
+    if [[ -x "$DOT_NOTIFY" ]]; then
+      "$DOT_NOTIFY" error "Theme switch failed" "macOS denied System Events automation permission"
+    fi
+    exit 1
+  fi
+}
+
+case "$OS" in
+  Linux)
+    apply_linux
+    ;;
+  Darwin)
+    apply_macos
+    ;;
+  *)
+    if [[ -x "$DOT_NOTIFY" ]]; then
+      "$DOT_NOTIFY" error "Theme switch failed" "Unsupported OS: $OS"
+    else
+      echo "Unsupported OS: $OS" >&2
+    fi
+    exit 1
+    ;;
+esac
+
+notify_theme

@@ -238,3 +238,43 @@ fi
 if command -v jenv >/dev/null 2>&1; then
   eval "$(jenv init -)"
 fi
+
+# -----------------------------
+# OS-specific fixes
+# -----------------------------
+
+case "$(uname -s)" in
+  Darwin)
+    # macOS native clipboard. Do not override it with xclip.
+    unalias pbcopy 2>/dev/null || true
+    unalias pbpaste 2>/dev/null || true
+
+    # BSD ls does not support --color=auto.
+    alias ls='ls -G'
+
+    # Linux-only env should not leak into macOS shell.
+    unset CUDA_HOME
+    unset CUDA_PATH
+    unset LD_LIBRARY_PATH
+
+    export ANDROID_HOME="$HOME/Library/Android/sdk"
+    export ANDROID_SDK_ROOT="$ANDROID_HOME"
+
+    path=(
+      /opt/homebrew/bin
+      /opt/homebrew/sbin
+      /usr/local/bin
+      /usr/local/sbin
+      "$ANDROID_HOME/platform-tools"
+      "$HOME/.local/bin"
+      $path
+    )
+    ;;
+
+  Linux)
+    if command -v xclip >/dev/null 2>&1; then
+      alias pbcopy='xclip -selection clipboard'
+      alias pbpaste='xclip -selection clipboard -o'
+    fi
+    ;;
+esac

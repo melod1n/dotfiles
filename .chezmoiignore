@@ -9,3 +9,16 @@
 **/known_hosts
 **/.DS_Store
 **/cache/**
+
+{{ if eq .chezmoi.os "darwin" }}
+dot_config/hypr/**
+dot_config/waybar/**
+dot_config/fuzzel/**
+dot_config/qt6ct/**
+dot_config/gtk-3.0/**
+dot_config/gtk-4.0/**
+dot_config/darkman/**
+dot_config/xdg-desktop-portal/**
+dot_local/share/dark-mode.d/**
+dot_local/share/light-mode.d/**
+{{ end }}

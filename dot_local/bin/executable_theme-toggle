@@ -2,23 +2,56 @@
 set -euo pipefail
 
 DOT_NOTIFY="$HOME/.local/bin/dot-notify"
+OS="$(uname -s 2>/dev/null || echo unknown)"
 
 if [[ -x "$HOME/.local/bin/theme-deps-check" ]]; then
   "$HOME/.local/bin/theme-deps-check" || true
 fi
 
-if ! command -v darkman >/dev/null 2>&1; then
-  if [[ -x "$DOT_NOTIFY" ]]; then
-    "$DOT_NOTIFY" error "darkman is missing" "Install: sudo pacman -S darkman" || true
-  else
-    echo "darkman is missing. Install: sudo pacman -S darkman" >&2
+toggle_linux() {
+  if ! command -v darkman >/dev/null 2>&1; then
+    if [[ -x "$DOT_NOTIFY" ]]; then
+      "$DOT_NOTIFY" error "darkman is missing" "Install: sudo pacman -S darkman" || true
+    else
+      echo "darkman is missing. Install: sudo pacman -S darkman" >&2
+    fi
+    exit 1
   fi
 
-  exit 1
-fi
+  if command -v systemctl >/dev/null 2>&1; then
+    systemctl --user start darkman.service >/dev/null 2>&1 || true
+  fi
 
-if command -v systemctl >/dev/null 2>&1; then
-  systemctl --user start darkman.service >/dev/null 2>&1 || true
-fi
+  darkman toggle
+}
 
-darkman toggle
+toggle_macos() {
+  local current next
+
+  current="$(defaults read -g AppleInterfaceStyle 2>/dev/null || echo Light)"
+
+  if [[ "$current" == "Dark" ]]; then
+    next="light"
+  else
+    next="dark"
+  fi
+
+  exec "$HOME/.local/bin/apply-theme" "$next"
+}
+
+case "$OS" in
+  Linux)
+    toggle_linux
+    ;;
+  Darwin)
+    toggle_macos
+    ;;
+  *)
+    if [[ -x "$DOT_NOTIFY" ]]; then
+      "$DOT_NOTIFY" error "Theme toggle failed" "Unsupported OS: $OS"
+    else
+      echo "Unsupported OS: $OS" >&2
+    fi
+    exit 1
+    ;;
+esac
