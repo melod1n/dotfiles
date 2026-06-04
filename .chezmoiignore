@@ -1,0 +1,11 @@
+**/*secret*
+**/*token*
+**/*password*
+**/*credentials*
+**/*.pem
+**/*.key
+**/id_rsa
+**/id_ed25519
+**/known_hosts
+**/.DS_Store
+**/cache/**
