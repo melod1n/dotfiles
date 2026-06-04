@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+DOT_NOTIFY="$HOME/.local/bin/dot-notify"
+
 MODE="${1:-}"
 
 case "$MODE" in
@@ -28,19 +30,8 @@ case "$MODE" in
     ;;
 esac
 
-notify_ok() {
-  local title="$1"
-  local body="$2"
-
-  if command -v notify-send >/dev/null 2>&1; then
-    notify-send -a dotfiles "$title" "$body" -t 1500
-  elif command -v hyprctl >/dev/null 2>&1 && [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]]; then
-    hyprctl notify 1 4000 "rgb(a6e3a1)" "$title: $body" >/dev/null 2>&1 || true
-  fi
-}
-
-if command -v theme-deps-check >/dev/null 2>&1; then
-  theme-deps-check --quiet || true
+if [[ -x "$HOME/.local/bin/theme-deps-check" ]]; then
+  "$HOME/.local/bin/theme-deps-check" || true
 fi
 
 mkdir -p \
@@ -71,8 +62,6 @@ if command -v kwriteconfig6 >/dev/null 2>&1; then
   kwriteconfig6 --file kdeglobals --group General --key ColorScheme "$KDE_SCHEME"
   kwriteconfig6 --file kdeglobals --group Icons --key Theme "$ICON_THEME"
   kwriteconfig6 --file kdeglobals --group KDE --key widgetStyle Breeze
-
-  # Dolphin вне Plasma часто не перечитывает тему сам.
   kwriteconfig6 --file dolphinrc --group UiSettings --key ColorScheme "$DOLPHIN_SCHEME"
 fi
 
@@ -101,9 +90,12 @@ echo "$MODE" > "$HOME/.local/state/theme-mode"
 dbus-send --session --type=signal /KGlobalSettings org.kde.KGlobalSettings.notifyChange int32:0 int32:0 2>/dev/null || true
 dbus-send --session --type=signal /KGlobalSettings org.kde.KGlobalSettings.notifyChange int32:2 int32:0 2>/dev/null || true
 
-# Dolphin упёртый: новый запуск будет уже с актуальной темой.
+# Dolphin вне Plasma плохо обновляет тему на лету.
+# Новый запуск будет уже с актуальной темой.
 if pgrep -x dolphin >/dev/null 2>&1; then
   pkill -x dolphin || true
 fi
 
-notify_ok "Theme switched" "$MODE mode"
+if [[ "${DOT_THEME_NOTIFY:-1}" != "0" && -x "$DOT_NOTIFY" ]]; then
+  "$DOT_NOTIFY" theme "Theme switched" "$MODE mode" || true
+fi

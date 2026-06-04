@@ -1,27 +1,23 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-APP_NAME="dotfiles"
+DOT_NOTIFY="$HOME/.local/bin/dot-notify"
 LOCK_FILE="${XDG_RUNTIME_DIR:-/tmp}/dotfiles-update.lock"
 
 notify() {
-  local urgency="$1"
+  local type="$1"
   local title="$2"
   local body="${3:-}"
 
-  if command -v notify-send >/dev/null 2>&1; then
-    notify-send -a "$APP_NAME" -u "$urgency" "$title" "$body" -t 1500
-  elif command -v hyprctl >/dev/null 2>&1 && [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]]; then
-    local color="rgb(a6e3a1)"
-    [[ "$urgency" == "critical" ]] && color="rgb(ff5555)"
-    hyprctl notify 1 8000 "$color" "$title: ${body//$'\n'/; }" >/dev/null 2>&1 || true
+  if [[ -x "$DOT_NOTIFY" ]]; then
+    "$DOT_NOTIFY" "$type" "$title" "$body" || true
   else
-    printf '%s\n%s\n' "$title" "$body" >&2
+    printf '[%s] %s\n%s\n' "$type" "$title" "$body" >&2
   fi
 }
 
 fail() {
-  notify critical "Dotfiles update failed" "$1"
+  notify error "Dotfiles update failed" "$1"
   exit 1
 }
 
@@ -50,14 +46,12 @@ cd "$SOURCE_DIR"
 
 CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo unknown)"
 
-# Проверяем, есть ли upstream.
 if ! git rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1; then
   fail "Current branch has no upstream: $CURRENT_BRANCH"
 fi
 
-# Показываем незакоммиченные изменения, но не ломаемся.
 if ! git diff --quiet || ! git diff --cached --quiet; then
-  notify normal "Dotfiles have local changes" "Pull will use --autostash"
+  notify important "Dotfiles have local changes" "Pull will use --autostash"
 fi
 
 git fetch --prune
@@ -78,9 +72,8 @@ notify normal "Applying dotfiles" "$PULL_STATUS"
 
 chezmoi apply -v
 
-# Не фейлим весь update из-за theme-deps-check: это информационная проверка.
-if command -v theme-deps-check >/dev/null 2>&1; then
-  theme-deps-check || true
+if [[ -x "$HOME/.local/bin/theme-deps-check" ]]; then
+  "$HOME/.local/bin/theme-deps-check" || true
 fi
 
-notify normal "Dotfiles updated" "$PULL_STATUS"
+notify success "Dotfiles updated" "$PULL_STATUS"

@@ -1,26 +1,7 @@
 #!/usr/bin/env bash
 set -u
 
-QUIET="${1:-}"
-
-notify_problem() {
-  local title="$1"
-  local body="$2"
-
-  if [[ "$QUIET" == "--quiet" ]]; then
-    printf '%s\n%s\n' "$title" "$body" >&2
-    return 0
-  fi
-
-  if command -v notify-send >/dev/null 2>&1; then
-    notify-send -u critical -a dotfiles "$title" "$body"
-  elif command -v hyprctl >/dev/null 2>&1 && [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]]; then
-    local one_line="${body//$'\n'/; }"
-    hyprctl notify 3 12000 "rgb(ff5555)" "$title: $one_line" >/dev/null 2>&1 || true
-  else
-    printf '%s\n%s\n' "$title" "$body" >&2
-  fi
-}
+DOT_NOTIFY="$HOME/.local/bin/dot-notify"
 
 missing=()
 
@@ -83,7 +64,11 @@ sudo pacman -S --needed darkman libnotify kconfig kservice dbus glib2 gsettings-
 AUR:
 yay -S --needed hyprqt6engine"
 
-  notify_problem "Theme setup incomplete" "$body"
+  if [[ -x "$DOT_NOTIFY" ]]; then
+    "$DOT_NOTIFY" important "Theme setup incomplete" "$body" || true
+  else
+    printf '%s\n' "$body" >&2
+  fi
 fi
 
 exit 0

@@ -1,16 +1,19 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if command -v theme-deps-check >/dev/null 2>&1; then
-  theme-deps-check --quiet || true
+DOT_NOTIFY="$HOME/.local/bin/dot-notify"
+
+if [[ -x "$HOME/.local/bin/theme-deps-check" ]]; then
+  "$HOME/.local/bin/theme-deps-check" || true
 fi
 
 if ! command -v darkman >/dev/null 2>&1; then
-  if command -v notify-send >/dev/null 2>&1; then
-    notify-send -u critical -a dotfiles "darkman is missing" "Install: sudo pacman -S darkman"
-  elif command -v hyprctl >/dev/null 2>&1; then
-    hyprctl notify 3 8000 "rgb(ff5555)" "darkman is missing. Install: sudo pacman -S darkman" >/dev/null 2>&1 || true
+  if [[ -x "$DOT_NOTIFY" ]]; then
+    "$DOT_NOTIFY" error "darkman is missing" "Install: sudo pacman -S darkman" || true
+  else
+    echo "darkman is missing. Install: sudo pacman -S darkman" >&2
   fi
+
   exit 1
 fi
 

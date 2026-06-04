@@ -1,0 +1,141 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+CONFIG="$HOME/.config/dotfiles/notify.env"
+
+if [[ -f "$CONFIG" ]]; then
+  # shellcheck disable=SC1090
+  source "$CONFIG"
+fi
+
+TYPE="${1:-normal}"
+TITLE="${2:-Notification}"
+BODY="${3:-}"
+
+APP_NAME="${DOT_NOTIFY_APP_NAME:-dotfiles}"
+BACKEND="${DOT_NOTIFY_BACKEND:-auto}"
+
+case "$TYPE" in
+  theme)
+    URGENCY="low"
+    TIMEOUT="${DOT_NOTIFY_THEME_MS:-1500}"
+    HYPR_ICON=1
+    HYPR_COLOR="rgb(89b4fa)"
+    ;;
+
+  success|ok)
+    URGENCY="normal"
+    TIMEOUT="${DOT_NOTIFY_SUCCESS_MS:-2500}"
+    HYPR_ICON=1
+    HYPR_COLOR="rgb(a6e3a1)"
+    ;;
+
+  normal|info)
+    URGENCY="normal"
+    TIMEOUT="${DOT_NOTIFY_NORMAL_MS:-4000}"
+    HYPR_ICON=1
+    HYPR_COLOR="rgb(cdd6f4)"
+    ;;
+
+  important|warning|warn)
+    URGENCY="critical"
+    TIMEOUT="${DOT_NOTIFY_IMPORTANT_MS:-0}"
+    HYPR_ICON=2
+    HYPR_COLOR="rgb(f9e2af)"
+    ;;
+
+  error|critical|fail|failed)
+    URGENCY="critical"
+    TIMEOUT="${DOT_NOTIFY_ERROR_MS:-0}"
+    HYPR_ICON=3
+    HYPR_COLOR="rgb(ff5555)"
+    ;;
+
+  *)
+    URGENCY="normal"
+    TIMEOUT="${DOT_NOTIFY_NORMAL_MS:-4000}"
+    HYPR_ICON=1
+    HYPR_COLOR="rgb(cdd6f4)"
+    ;;
+esac
+
+if [[ "$TIMEOUT" == "0" ]]; then
+  HYPR_TIMEOUT="${DOT_NOTIFY_HYPR_INFINITE_MS:-86400000}"
+else
+  HYPR_TIMEOUT="$TIMEOUT"
+fi
+
+notify_via_notify_send() {
+  if [[ -n "$BODY" ]]; then
+    notify-send \
+      -a "$APP_NAME" \
+      -u "$URGENCY" \
+      -t "$TIMEOUT" \
+      "$TITLE" \
+      "$BODY"
+  else
+    notify-send \
+      -a "$APP_NAME" \
+      -u "$URGENCY" \
+      -t "$TIMEOUT" \
+      "$TITLE"
+  fi
+}
+
+notify_via_hyprctl() {
+  local message="$TITLE"
+
+  if [[ -n "$BODY" ]]; then
+    message="$message: ${BODY//$'\n'/; }"
+  fi
+
+  hyprctl notify \
+    "$HYPR_ICON" \
+    "$HYPR_TIMEOUT" \
+    "$HYPR_COLOR" \
+    "$message" >/dev/null
+}
+
+notify_via_stderr() {
+  if [[ -n "$BODY" ]]; then
+    printf '[%s] %s\n%s\n' "$TYPE" "$TITLE" "$BODY" >&2
+  else
+    printf '[%s] %s\n' "$TYPE" "$TITLE" >&2
+  fi
+}
+
+case "$BACKEND" in
+  notify-send)
+    if command -v notify-send >/dev/null 2>&1; then
+      notify_via_notify_send || notify_via_stderr
+    else
+      notify_via_stderr
+      exit 1
+    fi
+    ;;
+
+  hyprctl)
+    if command -v hyprctl >/dev/null 2>&1 && [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]]; then
+      notify_via_hyprctl || notify_via_stderr
+    else
+      notify_via_stderr
+      exit 1
+    fi
+    ;;
+
+  stderr)
+    notify_via_stderr
+    ;;
+
+  auto|*)
+    if command -v notify-send >/dev/null 2>&1; then
+      notify_via_notify_send && exit 0
+    fi
+
+    if command -v hyprctl >/dev/null 2>&1 && [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]]; then
+      notify_via_hyprctl && exit 0
+    fi
+
+    notify_via_stderr
+    ;;
+esac
