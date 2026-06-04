@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "==> Running pre-commit checks..."
+
+if command -v gitleaks >/dev/null 2>&1; then
+    echo "==> Checking staged files for secrets..."
+    gitleaks protect --staged --verbose
+else
+    echo "WARN: gitleaks is not installed, skipping secret scan"
+fi
+
+echo "==> Done"
