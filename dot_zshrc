@@ -259,6 +259,7 @@ case "$(uname -s)" in
 
     export ANDROID_HOME="$HOME/Library/Android/sdk"
     export ANDROID_SDK_ROOT="$ANDROID_HOME"
+    export HOMEBREW_NO_ENV_HINTS=1
 
     path=(
       /opt/homebrew/bin
@@ -278,3 +279,7 @@ case "$(uname -s)" in
     fi
     ;;
 esac
+
+if [[ -f ~/.zshrc.local ]]; then
+    source ~/.zshrc.local
+fi
