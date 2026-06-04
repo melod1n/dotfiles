@@ -4,7 +4,7 @@ alias dc='docker compose'
 alias dcu='dc pull && dc up -d'
 alias gh='history | grep'
 alias neofetch='fastfetch'
-alias lazyssh='TERM=xterm-256color lazyssh'
+alias dfu='dotfiles-update'
 
 export NVM_DIR="$HOME/.nvm"
 [[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh"

@@ -188,8 +188,7 @@ alias dc='docker compose'
 alias dcu='dc pull && dc up -d'
 alias gh='history | grep'
 alias neofetch='fastfetch'
-
-alias lazyssh='TERM=xterm-256color lazyssh'
+alias dfu='dotfiles-update'
 
 alias emulator='QT_QPA_PLATFORM=xcb ~/Android/Sdk/emulator/emulator '
 
