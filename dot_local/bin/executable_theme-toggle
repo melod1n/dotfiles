@@ -11,9 +11,9 @@ fi
 toggle_linux() {
   if ! command -v darkman >/dev/null 2>&1; then
     if [[ -x "$DOT_NOTIFY" ]]; then
-      "$DOT_NOTIFY" error "darkman is missing" "Install: sudo pacman -S darkman" || true
+      "$DOT_NOTIFY" error "darkman is missing" "Install it with your distro package manager" || true
     else
-      echo "darkman is missing. Install: sudo pacman -S darkman" >&2
+      echo "darkman is missing. Install it with your distro package manager" >&2
     fi
     exit 1
   fi

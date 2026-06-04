@@ -7,6 +7,10 @@ OS="$(uname -s 2>/dev/null || echo unknown)"
 missing=()
 optional=()
 
+is_hyprland_session() {
+  [[ "${XDG_CURRENT_DESKTOP:-}" == *Hyprland* || "${XDG_SESSION_DESKTOP:-}" == *Hyprland* || -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]]
+}
+
 need_cmd() {
   local cmd="$1"
   local pkg="$2"
@@ -27,26 +31,10 @@ need_path() {
 
 case "$OS" in
   Linux)
-    need_cmd darkman "pacman: darkman"
-    need_cmd notify-send "pacman: libnotify"
-    need_cmd gsettings "pacman: glib2"
-    need_cmd kwriteconfig6 "pacman: kconfig"
-    need_cmd dbus-send "pacman: dbus"
-    need_cmd kbuildsycoca6 "pacman: kservice"
-    need_cmd hyprctl "pacman: hyprland"
+    need_cmd darkman "your distro package manager"
 
-    need_path /usr/share/color-schemes/BreezeDark.colors "pacman: breeze"
-    need_path /usr/share/color-schemes/BreezeLight.colors "pacman: breeze"
-    need_path /usr/share/icons/breeze "pacman: breeze-icons"
-    need_path /usr/share/icons/breeze-dark "pacman: breeze-icons"
-    need_path /usr/share/themes/Breeze "pacman: breeze-gtk"
-    need_path /usr/share/themes/Breeze-Dark "pacman: breeze-gtk"
-    need_path /etc/xdg/menus "pacman: archlinux-xdg-menu"
-
-    if command -v pacman >/dev/null 2>&1; then
-      pacman -Qq hyprqt6engine >/dev/null 2>&1 || missing+=("hyprqt6engine  ← AUR: hyprqt6engine")
-      pacman -Qq xdg-desktop-portal >/dev/null 2>&1 || missing+=("xdg-desktop-portal  ← pacman: xdg-desktop-portal")
-      pacman -Qq xdg-desktop-portal-hyprland >/dev/null 2>&1 || missing+=("xdg-desktop-portal-hyprland  ← pacman: xdg-desktop-portal-hyprland")
+    if is_hyprland_session; then
+      need_cmd hyprctl "Hyprland session"
     fi
     ;;
 
@@ -67,11 +55,17 @@ esac
 if ((${#missing[@]} > 0)); then
   case "$OS" in
     Linux)
-      install_hint="Официальные пакеты:
-sudo pacman -S --needed darkman libnotify kconfig kservice dbus glib2 gsettings-desktop-schemas breeze breeze-icons breeze-gtk xdg-desktop-portal xdg-desktop-portal-hyprland archlinux-xdg-menu
-
-AUR:
-yay -S --needed hyprqt6engine"
+      if command -v pacman >/dev/null 2>&1; then
+        if is_hyprland_session; then
+          install_hint="Arch Linux:
+sudo pacman -S --needed darkman hyprland"
+        else
+          install_hint="Arch Linux:
+sudo pacman -S --needed darkman"
+        fi
+      else
+        install_hint="Install the missing components with your distro package manager."
+      fi
       ;;
     Darwin)
       install_hint="macOS:

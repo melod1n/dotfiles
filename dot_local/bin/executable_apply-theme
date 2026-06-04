@@ -6,6 +6,14 @@ OS="$(uname -s 2>/dev/null || echo unknown)"
 
 MODE="${1:-}"
 
+have_cmd() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+is_hyprland_session() {
+  [[ "${XDG_CURRENT_DESKTOP:-}" == *Hyprland* || "${XDG_SESSION_DESKTOP:-}" == *Hyprland* || -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]]
+}
+
 case "$MODE" in
   dark|light)
     ;;
@@ -30,6 +38,7 @@ echo "$MODE" > "$HOME/.local/state/theme-mode"
 
 apply_linux() {
   local QT_SCHEME KDE_SCHEME DOLPHIN_SCHEME ICON_THEME GTK_THEME GTK_COLOR_SCHEME GTK_DARK
+  local use_breeze_theme=0
 
   case "$MODE" in
     dark)
@@ -40,6 +49,9 @@ apply_linux() {
       GTK_THEME="Breeze-Dark"
       GTK_COLOR_SCHEME="prefer-dark"
       GTK_DARK="1"
+      if [[ -e "$QT_SCHEME" && -d /usr/share/icons/breeze-dark && -d /usr/share/themes/Breeze-Dark ]]; then
+        use_breeze_theme=1
+      fi
       ;;
     light)
       QT_SCHEME="/usr/share/color-schemes/BreezeLight.colors"
@@ -49,15 +61,16 @@ apply_linux() {
       GTK_THEME="Breeze"
       GTK_COLOR_SCHEME="prefer-light"
       GTK_DARK="0"
+      if [[ -e "$QT_SCHEME" && -d /usr/share/icons/breeze && -d /usr/share/themes/Breeze ]]; then
+        use_breeze_theme=1
+      fi
       ;;
   esac
 
-  mkdir -p \
-    "$HOME/.config/hypr" \
-    "$HOME/.config/gtk-3.0" \
-    "$HOME/.config/gtk-4.0"
+  if (( use_breeze_theme )) && is_hyprland_session && have_cmd hyprctl; then
+    mkdir -p "$HOME/.config/hypr"
 
-  cat > "$HOME/.config/hypr/hyprqt6engine.conf" <<EOF2
+    cat > "$HOME/.config/hypr/hyprqt6engine.conf" <<EOF2
 theme {
     color_scheme = $QT_SCHEME
     icon_theme = $ICON_THEME
@@ -74,38 +87,49 @@ misc {
     shortcuts_for_context_menus = true
 }
 EOF2
+  fi
 
-  if command -v kwriteconfig6 >/dev/null 2>&1; then
+  if (( use_breeze_theme )) && have_cmd kwriteconfig6; then
     kwriteconfig6 --file kdeglobals --group General --key ColorScheme "$KDE_SCHEME"
     kwriteconfig6 --file kdeglobals --group Icons --key Theme "$ICON_THEME"
     kwriteconfig6 --file kdeglobals --group KDE --key widgetStyle Breeze
     kwriteconfig6 --file dolphinrc --group UiSettings --key ColorScheme "$DOLPHIN_SCHEME"
   fi
 
-  if command -v gsettings >/dev/null 2>&1; then
+  if have_cmd gsettings; then
     gsettings set org.gnome.desktop.interface color-scheme "$GTK_COLOR_SCHEME" || true
-    gsettings set org.gnome.desktop.interface gtk-theme "$GTK_THEME" || true
-    gsettings set org.gnome.desktop.interface icon-theme "$ICON_THEME" || true
+    if (( use_breeze_theme )); then
+      gsettings set org.gnome.desktop.interface gtk-theme "$GTK_THEME" || true
+      gsettings set org.gnome.desktop.interface icon-theme "$ICON_THEME" || true
+    fi
   fi
 
-  cat > "$HOME/.config/gtk-3.0/settings.ini" <<EOF2
-[Settings]
-gtk-theme-name=$GTK_THEME
-gtk-icon-theme-name=$ICON_THEME
-gtk-application-prefer-dark-theme=$GTK_DARK
-EOF2
+  mkdir -p "$HOME/.config/gtk-3.0" "$HOME/.config/gtk-4.0"
 
-  cat > "$HOME/.config/gtk-4.0/settings.ini" <<EOF2
-[Settings]
-gtk-theme-name=$GTK_THEME
-gtk-icon-theme-name=$ICON_THEME
-gtk-application-prefer-dark-theme=$GTK_DARK
-EOF2
+  {
+    printf '[Settings]\n'
+    if (( use_breeze_theme )); then
+      printf 'gtk-theme-name=%s\n' "$GTK_THEME"
+      printf 'gtk-icon-theme-name=%s\n' "$ICON_THEME"
+    fi
+    printf 'gtk-application-prefer-dark-theme=%s\n' "$GTK_DARK"
+  } > "$HOME/.config/gtk-3.0/settings.ini"
 
-  dbus-send --session --type=signal /KGlobalSettings org.kde.KGlobalSettings.notifyChange int32:0 int32:0 2>/dev/null || true
-  dbus-send --session --type=signal /KGlobalSettings org.kde.KGlobalSettings.notifyChange int32:2 int32:0 2>/dev/null || true
+  {
+    printf '[Settings]\n'
+    if (( use_breeze_theme )); then
+      printf 'gtk-theme-name=%s\n' "$GTK_THEME"
+      printf 'gtk-icon-theme-name=%s\n' "$ICON_THEME"
+    fi
+    printf 'gtk-application-prefer-dark-theme=%s\n' "$GTK_DARK"
+  } > "$HOME/.config/gtk-4.0/settings.ini"
 
-  if pgrep -x dolphin >/dev/null 2>&1; then
+  if (( use_breeze_theme )) && have_cmd dbus-send; then
+    dbus-send --session --type=signal /KGlobalSettings org.kde.KGlobalSettings.notifyChange int32:0 int32:0 2>/dev/null || true
+    dbus-send --session --type=signal /KGlobalSettings org.kde.KGlobalSettings.notifyChange int32:2 int32:0 2>/dev/null || true
+  fi
+
+  if (( use_breeze_theme )) && pgrep -x dolphin >/dev/null 2>&1; then
     pkill -x dolphin || true
   fi
 }
