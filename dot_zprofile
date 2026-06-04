@@ -1,0 +1,19 @@
+case "$OSTYPE" in
+  darwin*)
+    # Action for macOS
+    if (( ${+commands[brew]} )); then
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+    fi
+    ;;
+  linux*)
+    # Action for Linux
+    # Login shell config
+    if [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
+        exec start-hyprland
+    fi
+    ;;
+  *)
+    # Unknown OS
+    echo "Unknown operating system: $OSTYPE"
+    ;;
+esac   
