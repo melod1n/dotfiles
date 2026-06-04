@@ -29,12 +29,37 @@ need_path() {
   fi
 }
 
+need_pacman_pkg() {
+  local pkg="$1"
+  local hint="$2"
+
+  if command -v pacman >/dev/null 2>&1 && ! pacman -Qq "$pkg" >/dev/null 2>&1; then
+    missing+=("$pkg  ← $hint")
+  fi
+}
+
 case "$OS" in
   Linux)
-    need_cmd darkman "your distro package manager"
+    need_cmd darkman "pacman: darkman"
+    need_cmd dbus-update-activation-environment "pacman: dbus"
+    need_cmd dbus-send "pacman: dbus"
+    need_cmd gsettings "pacman: glib2"
+    need_cmd kwriteconfig6 "pacman: kconfig"
+    need_cmd systemctl "pacman: systemd"
+
+    need_path /usr/share/color-schemes/BreezeDark.colors "pacman: breeze"
+    need_path /usr/share/color-schemes/BreezeLight.colors "pacman: breeze"
+    need_path /usr/share/icons/breeze "pacman: breeze-icons"
+    need_path /usr/share/icons/breeze-dark "pacman: breeze-icons"
+    need_path /usr/share/themes/Breeze "pacman: breeze-gtk"
+    need_path /usr/share/themes/Breeze-Dark "pacman: breeze-gtk"
+    need_path /usr/lib/xdg-desktop-portal "pacman: xdg-desktop-portal"
+    need_path /usr/lib/xdg-desktop-portal-gtk "pacman: xdg-desktop-portal-gtk"
 
     if is_hyprland_session; then
-      need_cmd hyprctl "Hyprland session"
+      need_cmd hyprctl "pacman: hyprland"
+      need_path /usr/lib/xdg-desktop-portal-hyprland "pacman: xdg-desktop-portal-hyprland"
+      need_pacman_pkg hyprqt6engine "AUR: hyprqt6engine"
     fi
     ;;
 
@@ -56,13 +81,10 @@ if ((${#missing[@]} > 0)); then
   case "$OS" in
     Linux)
       if command -v pacman >/dev/null 2>&1; then
-        if is_hyprland_session; then
-          install_hint="Arch Linux:
-sudo pacman -S --needed darkman hyprland"
-        else
-          install_hint="Arch Linux:
-sudo pacman -S --needed darkman"
-        fi
+        install_hint="Arch Linux:
+sudo pacman -S --needed darkman libnotify dbus glib2 gsettings-desktop-schemas kconfig breeze breeze-icons breeze-gtk xdg-desktop-portal xdg-desktop-portal-gtk xdg-desktop-portal-hyprland
+
+yay -S --needed hyprqt6engine"
       else
         install_hint="Install the missing components with your distro package manager."
       fi

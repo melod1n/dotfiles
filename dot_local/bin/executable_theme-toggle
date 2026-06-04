@@ -23,6 +23,12 @@ toggle_linux() {
   fi
 
   darkman toggle
+
+  # Normal path: darkman emits the Settings change and runs the hooks.
+  # Hard path: useful after portal config changes or if Chromium/Brave gets stuck.
+  if [[ "${DOT_THEME_HARD_RELOAD:-0}" == "1" && -x "$HOME/.local/bin/theme-reload" ]]; then
+    DOT_THEME_NOTIFY=0 "$HOME/.local/bin/theme-reload" || true
+  fi
 }
 
 toggle_macos() {

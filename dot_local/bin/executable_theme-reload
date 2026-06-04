@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DOT_NOTIFY="$HOME/.local/bin/dot-notify"
+MODE="$(cat "$HOME/.local/state/theme-mode" 2>/dev/null || echo dark)"
+
+case "$MODE" in
+  dark|light) ;;
+  *) MODE=dark ;;
+esac
+
+if command -v dbus-update-activation-environment >/dev/null 2>&1; then
+  dbus-update-activation-environment --systemd \
+    WAYLAND_DISPLAY \
+    XDG_CURRENT_DESKTOP \
+    XDG_SESSION_DESKTOP \
+    XDG_SESSION_TYPE \
+    QT_QPA_PLATFORM \
+    QT_QPA_PLATFORMTHEME \
+    XCURSOR_SIZE \
+    2>/dev/null || true
+fi
+
+if command -v systemctl >/dev/null 2>&1; then
+  systemctl --user import-environment \
+    WAYLAND_DISPLAY \
+    XDG_CURRENT_DESKTOP \
+    XDG_SESSION_DESKTOP \
+    XDG_SESSION_TYPE \
+    QT_QPA_PLATFORM \
+    QT_QPA_PLATFORMTHEME \
+    XCURSOR_SIZE \
+    >/dev/null 2>&1 || true
+
+  systemctl --user restart darkman.service >/dev/null 2>&1 || true
+  systemctl --user try-restart xdg-desktop-portal-hyprland.service >/dev/null 2>&1 || true
+  systemctl --user try-restart xdg-desktop-portal-gtk.service >/dev/null 2>&1 || true
+  systemctl --user restart xdg-desktop-portal.service >/dev/null 2>&1 || true
+fi
+
+if [[ -x "$HOME/.local/bin/apply-theme" ]]; then
+  DOT_THEME_NOTIFY=0 "$HOME/.local/bin/apply-theme" "$MODE" || true
+fi
+
+if [[ "${DOT_THEME_NOTIFY:-1}" != "0" && -x "$DOT_NOTIFY" ]]; then
+  "$DOT_NOTIFY" theme "Theme services reloaded" "$MODE mode" || true
+fi

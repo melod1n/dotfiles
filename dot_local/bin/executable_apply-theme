@@ -36,6 +36,41 @@ fi
 mkdir -p "$HOME/.local/state"
 echo "$MODE" > "$HOME/.local/state/theme-mode"
 
+import_linux_theme_env() {
+  local gtk_theme="$1"
+
+  export GTK_THEME="$gtk_theme"
+  export XDG_CURRENT_DESKTOP="${XDG_CURRENT_DESKTOP:-Hyprland}"
+  export XDG_SESSION_DESKTOP="${XDG_SESSION_DESKTOP:-Hyprland}"
+  export XDG_SESSION_TYPE="${XDG_SESSION_TYPE:-wayland}"
+  export QT_QPA_PLATFORM="${QT_QPA_PLATFORM:-wayland;xcb}"
+  export QT_QPA_PLATFORMTHEME="${QT_QPA_PLATFORMTHEME:-hyprqt6engine}"
+
+  if have_cmd dbus-update-activation-environment; then
+    dbus-update-activation-environment --systemd \
+      GTK_THEME \
+      XDG_CURRENT_DESKTOP \
+      XDG_SESSION_DESKTOP \
+      XDG_SESSION_TYPE \
+      QT_QPA_PLATFORM \
+      QT_QPA_PLATFORMTHEME \
+      XCURSOR_SIZE \
+      2>/dev/null || true
+  fi
+
+  if have_cmd systemctl; then
+    systemctl --user import-environment \
+      GTK_THEME \
+      XDG_CURRENT_DESKTOP \
+      XDG_SESSION_DESKTOP \
+      XDG_SESSION_TYPE \
+      QT_QPA_PLATFORM \
+      QT_QPA_PLATFORMTHEME \
+      XCURSOR_SIZE \
+      >/dev/null 2>&1 || true
+  fi
+}
+
 apply_linux() {
   local QT_SCHEME KDE_SCHEME DOLPHIN_SCHEME ICON_THEME GTK_THEME GTK_COLOR_SCHEME GTK_DARK
   local use_breeze_theme=0
@@ -66,6 +101,8 @@ apply_linux() {
       fi
       ;;
   esac
+
+  import_linux_theme_env "$GTK_THEME"
 
   if (( use_breeze_theme )) && is_hyprland_session && have_cmd hyprctl; then
     mkdir -p "$HOME/.config/hypr"
