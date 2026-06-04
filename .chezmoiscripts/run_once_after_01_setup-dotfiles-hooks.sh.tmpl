@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd "{{ .chezmoi.sourceDir }}"
+
+if [ -d ".git" ] && [ -d ".githooks" ]; then
+    git config core.hooksPath .githooks
+    echo "Dotfiles git hooks enabled"
+fi
