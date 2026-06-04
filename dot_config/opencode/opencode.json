@@ -1,0 +1,29 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+
+  "plugin": [
+    [
+      "opencode-models-discovery",
+      {
+        "smartModelName": false
+      }
+    ]
+  ],
+
+  "disabled_providers": [],
+
+  "provider": {
+    "llama.cpp": {
+      "name": "llama.cpp (Local)",
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "baseURL": "{env:LLAMA_CPP_URL}",
+        "modelsDiscovery": {
+          "enabled": true,
+          "endpoint": "/v1/models"
+        }
+      },
+      "models": {}
+    }
+  }
+}
