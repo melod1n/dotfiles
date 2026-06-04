@@ -1,0 +1,20 @@
+# ~/.bashrc
+alias sudo='sudo '
+alias dc='docker compose'
+alias dcu='dc pull && dc up -d'
+alias gh='history | grep'
+alias neofetch='fastfetch'
+alias lazyssh='TERM=xterm-256color lazyssh'
+
+export NVM_DIR="$HOME/.nvm"
+[[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh"
+
+export JENV_ROOT="$HOME/.jenv"
+export PATH="$JENV_ROOT/bin:$HOME/.opencode/bin:$HOME/Android/Sdk/platform-tools:$PATH"
+
+export CUDA_HOME=/opt/cuda
+export CUDA_PATH=/opt/cuda
+export PATH="$CUDA_PATH/bin:$PATH"
+export LD_LIBRARY_PATH="$CUDA_PATH/lib64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+
+export PATH="$PATH:/usr/local/go/bin"

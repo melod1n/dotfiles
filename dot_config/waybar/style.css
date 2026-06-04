@@ -1,0 +1,145 @@
+* {
+    font-family: "Inter", "JetBrainsMono Nerd Font", "Symbols Nerd Font Mono", "Symbols Nerd Font", "Font Awesome 6 Free", sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    min-height: 0;
+    border: none;
+    box-shadow: none;
+    letter-spacing: 0;
+}
+
+window#waybar {
+    background: transparent;
+    color: #e6e6f0;
+}
+
+.modules-left,
+.modules-center,
+.modules-right {
+    background: rgba(17, 17, 27, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 4px 4px;
+}
+
+#workspaces button {
+    background: rgba(17, 17, 27, 0.82);
+    color: #8f8fa3;
+    border-radius: 999px;
+    padding: 6px 14px;
+    margin: 0 2px;
+    transition: all 0.25s ease-in-out;
+}
+
+#workspaces button.active {
+    background: #8b5cf6;
+    color: white;
+}
+
+#window {
+    color: #c9c9d8;
+    padding: 0 10px 0 4px;
+    margin: 0;
+}
+
+#clock,
+#custom-media,
+#custom-weather,
+#language,
+#tray,
+#pulseaudio,
+#network,
+#custom-bluetooth,
+#custom-cpu,
+#custom-gpu,
+#memory,
+#disk,
+#battery,
+#custom-power,
+#custom-theme {
+    background: rgba(255, 255, 255, 0.075);
+    color: #e6e6f0;
+    border-radius: 999px;
+    padding: 3px 10px;
+    margin: 0;
+}
+
+#clock {
+    background: #8b5cf6;
+    color: white;
+    padding: 3px 15px;
+    transition: background 0.25s ease-in-out;
+}
+
+#clock:hover {
+    background: #b00b69;
+}
+
+#custom-bluetooth {
+    padding-bottom: 2px;
+}
+
+#custom-power {
+    background: #ef4444;
+    color: white;
+    /*padding: 3px 11px;*/
+    padding: 6px 24px 8px 20px;
+}
+
+#custom-cpu.normal {
+  color: #a6e3a1;
+}
+
+#custom-cpu.busy {
+  color: #89b4fa;
+}
+
+#custom-cpu.warning {
+  color: #f9e2af;
+}
+
+#custom-cpu.critical {
+  color: #f38ba8;
+}
+
+#custom-cpu.missing,
+#custom-cpu.error {
+  color: #9399b2;
+}
+
+#custom-gpu.normal {
+  color: #a6e3a1;
+}
+
+#custom-gpu.busy {
+  color: #89b4fa;
+}
+
+#custom-gpu.warning {
+  color: #f9e2af;
+}
+
+#custom-gpu.critical {
+  color: #f38ba8;
+}
+
+#custom-gpu.missing,
+#custom-gpu.error {
+  color: #9399b2;
+}
+
+#language {
+    min-width: 26px;
+    padding: 3px 9px;
+}
+
+
+#tray {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+#tray > .passive,
+#tray > .active,
+#tray > .needs-attention {
+  padding: 0 4px;
+}

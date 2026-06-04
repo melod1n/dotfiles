@@ -1,0 +1,169 @@
+{
+  "layer": "top",
+  "position": "top",
+  "height": 42,
+  "spacing": 6,
+  "margin-top": 8,
+  "margin-left": 10,
+  "margin-right": 10,
+  "modules-left": [
+    "hyprland/workspaces",
+    "hyprland/window"
+  ],
+  "modules-center": [
+    "clock",
+    "custom/media",
+    "custom/weather"
+  ],
+  "modules-right": [
+    "tray",
+    "hyprland/language",
+    "pulseaudio",
+    // "network",
+    "custom/bluetooth",
+    "custom/cpu",
+    "custom/gpu",
+    "memory",
+    "disk",
+    "custom/power"
+  ],
+  "hyprland/workspaces": {
+    "disable-scroll": false,
+    "all-outputs": false,
+    "warp-on-scroll": false,
+    "format": "{icon}",
+    "format-icons": {
+      "urgent": "!"
+    },
+    "persistent-workspaces": {
+      "*": 6
+    }
+  },
+  "hyprland/window": {
+    "format": "{}",
+    "icon": true,
+    "icon-size": 20,
+    "max-length": 55,
+    "separate-outputs": true,
+    "rewrite": {
+      "": "Desktop",
+      "^.* - Google Chrome$": "Google Chrome",
+      "^Google Chrome$": "Google Chrome"
+    }
+  },
+  "clock": {
+    "timezone": "Europe/Moscow",
+    "format": "   {:%H:%M}",
+    "format-alt": "󰃭   {:%A, %B %d, %Y}",
+    "on-click": "~/.config/waybar/scripts/toggle-calendar.sh",
+    "on-click-right": "~/.config/waybar/scripts/toggle-calendar.sh",
+    "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+    "calendar": {
+      "mode": "month",
+      "on-scroll": 1,
+      "format": {
+        "months": "<span color='#ffead3'><b>{}</b></span>",
+        "days": "<span color='#ecc6d9'><b>{}</b></span>",
+        "weeks": "<span color='#99ff99'><b>W{}</b></span>",
+        "weekdays": "<span color='#ffcc66'><b>{}</b></span>",
+        "today": "<span color='#ff6699'><b><u>{}</u></b></span>"
+      }
+    }
+  },
+  "custom/media": {
+    "format": "{icon} {}",
+    "max-length": 40,
+    "format-icons": {
+      "spotify": "",
+      "default": "🎜"
+    },
+    "escape": true,
+    "return-type": "json",
+    "exec": "playerctl -F metadata --format '{\"text\": \"{{artist}} - {{title}}\", \"class\": \"{{playerName}}\"}' 2> /dev/null",
+    "on-click": "playerctl play-pause",
+    "on-scroll-up": "playerctl next",
+    "on-scroll-down": "playerctl previous"
+  },
+  "custom/bluetooth": {
+    "format": " ",
+    "on-click": "blueman-manager",
+    "interval": 30,
+    "exec": "bluetoothctl show | grep -q 'Powered: yes' && echo '   On' || echo '   Off'"
+  },
+  "custom/weather": {
+    "format": "{}°",
+    "tooltip": true,
+    "interval": 3600,
+    "exec": "curl -s 'wttr.in/Krasnodar?format=%c%t'",
+    "exec-if": "ping -c 1 8.8.8.8 > /dev/null"
+  },
+  "hyprland/language": {
+    "keyboard-name": "gaming-keyboard",
+    "format": "{}",
+    "format-en": "🇺🇸",
+    "format-ru": "🇷🇺",
+    "tooltip": false,
+    "on-click": "hyprctl switchxkblayout all next"
+  },
+  "tray": {
+    "icon-size": 16,
+    "spacing": 8,
+    "show-passive-items": true
+  },
+  "pulseaudio": {
+    "format": "{icon}   {volume}%",
+    "format-muted": "MUTE",
+    "on-click": "pavucontrol",
+    "format-icons": {
+      "headphone": "",
+      "hands-free": "",
+      "headset": "",
+      "phone": "",
+      "portable": "",
+      "car": "",
+      "default": [
+        "",
+        "",
+        ""
+      ]
+    }
+  },
+  "network": {
+    "format-wifi": "   {essid}",
+    "format-ethernet": "󰈀   {ipaddr}",
+    "format-disconnected": "󰖪   offline",
+    "tooltip-format": "{ifname}: {ipaddr}"
+  },
+  "custom/cpu": {
+    "exec": "~/.config/waybar/scripts/cpu.sh",
+    "interval": 2,
+    "return-type": "json",
+    "tooltip": true
+  },
+  "custom/gpu": {
+    "exec": "~/.config/waybar/scripts/gpu-nvidia.sh",
+    "return-type": "json",
+    "interval": 5,
+    "tooltip": true
+  },
+  "memory": {
+    "format": "   {}%",
+    "tooltip-format": "RAM: {used:0.1f} / {total:0.1f} GiB\nSwap: {swapUsed:0.1f} / {swapTotal:0.1f} GiB",
+    "interval": 5
+  },
+  "disk": {
+    "path": "/",
+    "format": "󰋊  {percentage_used}%",
+    "tooltip-format": "Path: {path}\nDisk: {used} / {total}\nFree: {free}"
+  },
+  "battery": {
+    "format": "BAT {capacity}%",
+    "format-charging": "CHG {capacity}%",
+    "format-plugged": "AC {capacity}%"
+  },
+  "custom/power": {
+    "format": "⏻",
+    "tooltip": false,
+    "on-click": "~/.config/waybar/scripts/power-menu.sh"
+  }
+}
