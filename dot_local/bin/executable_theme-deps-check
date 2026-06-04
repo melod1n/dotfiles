@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+set -u
+
+QUIET="${1:-}"
+
+notify_problem() {
+  local title="$1"
+  local body="$2"
+
+  if [[ "$QUIET" == "--quiet" ]]; then
+    printf '%s\n%s\n' "$title" "$body" >&2
+    return 0
+  fi
+
+  if command -v notify-send >/dev/null 2>&1; then
+    notify-send -u critical -a dotfiles "$title" "$body"
+  elif command -v hyprctl >/dev/null 2>&1 && [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]]; then
+    local one_line="${body//$'\n'/; }"
+    hyprctl notify 3 12000 "rgb(ff5555)" "$title: $one_line" >/dev/null 2>&1 || true
+  else
+    printf '%s\n%s\n' "$title" "$body" >&2
+  fi
+}
+
+missing=()
+
+need_cmd() {
+  local cmd="$1"
+  local pkg="$2"
+
+  if ! command -v "$cmd" >/dev/null 2>&1; then
+    missing+=("$cmd  ← пакет: $pkg")
+  fi
+}
+
+need_path() {
+  local path="$1"
+  local pkg="$2"
+
+  if [[ ! -e "$path" ]]; then
+    missing+=("$path  ← пакет: $pkg")
+  fi
+}
+
+need_cmd darkman darkman
+need_cmd notify-send libnotify
+need_cmd gsettings glib2
+need_cmd kwriteconfig6 kconfig
+need_cmd dbus-send dbus
+need_cmd kbuildsycoca6 kservice
+need_cmd hyprctl hyprland
+
+need_path /usr/share/color-schemes/BreezeDark.colors breeze
+need_path /usr/share/color-schemes/BreezeLight.colors breeze
+need_path /usr/share/icons/breeze breeze-icons
+need_path /usr/share/icons/breeze-dark breeze-icons
+need_path /usr/share/themes/Breeze breeze-gtk
+need_path /usr/share/themes/Breeze-Dark breeze-gtk
+need_path /etc/xdg/menus archlinux-xdg-menu
+
+if command -v pacman >/dev/null 2>&1; then
+  if ! pacman -Qq hyprqt6engine >/dev/null 2>&1; then
+    missing+=("hyprqt6engine  ← AUR: hyprqt6engine")
+  fi
+
+  if ! pacman -Qq xdg-desktop-portal >/dev/null 2>&1; then
+    missing+=("xdg-desktop-portal  ← пакет: xdg-desktop-portal")
+  fi
+
+  if ! pacman -Qq xdg-desktop-portal-hyprland >/dev/null 2>&1; then
+    missing+=("xdg-desktop-portal-hyprland  ← пакет: xdg-desktop-portal-hyprland")
+  fi
+fi
+
+if ((${#missing[@]} > 0)); then
+  body="Не хватает компонентов:
+
+$(printf '• %s\n' "${missing[@]}")
+
+Официальные пакеты:
+sudo pacman -S --needed darkman libnotify kconfig kservice dbus glib2 gsettings-desktop-schemas breeze breeze-icons breeze-gtk xdg-desktop-portal xdg-desktop-portal-hyprland archlinux-xdg-menu
+
+AUR:
+yay -S --needed hyprqt6engine"
+
+  notify_problem "Theme setup incomplete" "$body"
+fi
+
+exit 0

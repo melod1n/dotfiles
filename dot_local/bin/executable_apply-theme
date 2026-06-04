@@ -1,0 +1,109 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+MODE="${1:-}"
+
+case "$MODE" in
+  dark)
+    QT_SCHEME="/usr/share/color-schemes/BreezeDark.colors"
+    KDE_SCHEME="BreezeDark"
+    DOLPHIN_SCHEME="Breeze Dark"
+    ICON_THEME="breeze-dark"
+    GTK_THEME="Breeze-Dark"
+    GTK_COLOR_SCHEME="prefer-dark"
+    GTK_DARK="1"
+    ;;
+  light)
+    QT_SCHEME="/usr/share/color-schemes/BreezeLight.colors"
+    KDE_SCHEME="BreezeLight"
+    DOLPHIN_SCHEME="Breeze Light"
+    ICON_THEME="breeze"
+    GTK_THEME="Breeze"
+    GTK_COLOR_SCHEME="prefer-light"
+    GTK_DARK="0"
+    ;;
+  *)
+    echo "Usage: apply-theme dark|light" >&2
+    exit 2
+    ;;
+esac
+
+notify_ok() {
+  local title="$1"
+  local body="$2"
+
+  if command -v notify-send >/dev/null 2>&1; then
+    notify-send -a dotfiles "$title" "$body" -t 1500
+  elif command -v hyprctl >/dev/null 2>&1 && [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]]; then
+    hyprctl notify 1 4000 "rgb(a6e3a1)" "$title: $body" >/dev/null 2>&1 || true
+  fi
+}
+
+if command -v theme-deps-check >/dev/null 2>&1; then
+  theme-deps-check --quiet || true
+fi
+
+mkdir -p \
+  "$HOME/.config/hypr" \
+  "$HOME/.config/gtk-3.0" \
+  "$HOME/.config/gtk-4.0" \
+  "$HOME/.local/state"
+
+cat > "$HOME/.config/hypr/hyprqt6engine.conf" <<EOF2
+theme {
+    color_scheme = $QT_SCHEME
+    icon_theme = $ICON_THEME
+    style = Breeze
+    font = Noto Sans
+    font_size = 10
+    font_fixed = JetBrains Mono
+    font_fixed_size = 10
+}
+
+misc {
+    single_click_activate = false
+    menus_have_icons = true
+    shortcuts_for_context_menus = true
+}
+EOF2
+
+if command -v kwriteconfig6 >/dev/null 2>&1; then
+  kwriteconfig6 --file kdeglobals --group General --key ColorScheme "$KDE_SCHEME"
+  kwriteconfig6 --file kdeglobals --group Icons --key Theme "$ICON_THEME"
+  kwriteconfig6 --file kdeglobals --group KDE --key widgetStyle Breeze
+
+  # Dolphin вне Plasma часто не перечитывает тему сам.
+  kwriteconfig6 --file dolphinrc --group UiSettings --key ColorScheme "$DOLPHIN_SCHEME"
+fi
+
+if command -v gsettings >/dev/null 2>&1; then
+  gsettings set org.gnome.desktop.interface color-scheme "$GTK_COLOR_SCHEME" || true
+  gsettings set org.gnome.desktop.interface gtk-theme "$GTK_THEME" || true
+  gsettings set org.gnome.desktop.interface icon-theme "$ICON_THEME" || true
+fi
+
+cat > "$HOME/.config/gtk-3.0/settings.ini" <<EOF2
+[Settings]
+gtk-theme-name=$GTK_THEME
+gtk-icon-theme-name=$ICON_THEME
+gtk-application-prefer-dark-theme=$GTK_DARK
+EOF2
+
+cat > "$HOME/.config/gtk-4.0/settings.ini" <<EOF2
+[Settings]
+gtk-theme-name=$GTK_THEME
+gtk-icon-theme-name=$ICON_THEME
+gtk-application-prefer-dark-theme=$GTK_DARK
+EOF2
+
+echo "$MODE" > "$HOME/.local/state/theme-mode"
+
+dbus-send --session --type=signal /KGlobalSettings org.kde.KGlobalSettings.notifyChange int32:0 int32:0 2>/dev/null || true
+dbus-send --session --type=signal /KGlobalSettings org.kde.KGlobalSettings.notifyChange int32:2 int32:0 2>/dev/null || true
+
+# Dolphin упёртый: новый запуск будет уже с актуальной темой.
+if pgrep -x dolphin >/dev/null 2>&1; then
+  pkill -x dolphin || true
+fi
+
+notify_ok "Theme switched" "$MODE mode"
