@@ -1,6 +1,131 @@
 {
   "$schema": "https://opencode.ai/config.json",
 
+  "default_agent": "lead",
+  "share": "manual",
+  "snapshot": true,
+
+  "permission": {
+    "edit": "ask",
+    "bash": "ask",
+    "external_directory": "ask"
+  },
+
+  "mcp": {
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
+      },
+      "enabled": true,
+      "timeout": 10000
+    },
+
+    "gh_grep": {
+      "type": "remote",
+      "url": "https://mcp.grep.app",
+      "enabled": true,
+      "timeout": 10000
+    },
+
+    "sentry": {
+      "type": "remote",
+      "url": "https://mcp.sentry.dev/mcp",
+      "oauth": {},
+      "enabled": false,
+      "timeout": 10000
+    },
+
+    "playwright": {
+      "type": "local",
+      "command": ["npx", "-y", "@playwright/mcp@latest"],
+      "enabled": false,
+      "timeout": 30000
+    }
+  },
+
+  "tools": {
+    "context7_*": false,
+    "gh_grep_*": false,
+    "sentry_*": false,
+    "playwright_*": false
+  },
+
+  "agent": {
+    "external-researcher": {
+      "tools": {
+        "context7_*": true,
+        "gh_grep_*": true
+      }
+    },
+
+    "architect": {
+      "tools": {
+        "context7_*": true,
+        "gh_grep_*": true
+      }
+    },
+
+    "kotlin-android": {
+      "tools": {
+        "context7_*": true,
+        "gh_grep_*": true
+      }
+    },
+
+    "backend": {
+      "tools": {
+        "context7_*": true,
+        "gh_grep_*": true
+      }
+    },
+
+    "devops": {
+      "tools": {
+        "context7_*": true,
+        "gh_grep_*": true
+      }
+    },
+
+    "ui-tui": {
+      "tools": {
+        "context7_*": true,
+        "gh_grep_*": true,
+        "playwright_*": true
+      }
+    },
+
+    "tester": {
+      "tools": {
+        "playwright_*": true
+      }
+    }
+  },
+
+  "watcher": {
+    "ignore": [
+      "node_modules/**",
+      "dist/**",
+      "build/**",
+      ".git/**",
+      ".gradle/**",
+      "target/**",
+      ".idea/**",
+      ".kotlin/**",
+      ".fleet/**",
+      ".run/**"
+    ]
+  },
+
+  "compaction": {
+    "auto": true,
+    "prune": false,
+    "reserved": 10000
+  },
+
+  "lsp": true,
+
   "plugin": [
     [
       "opencode-models-discovery",
