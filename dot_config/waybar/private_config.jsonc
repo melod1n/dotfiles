@@ -22,10 +22,10 @@
     // "network",
     "custom/bluetooth",
     "battery",
-    // "custom/cpu",
-    // "custom/gpu",
-    // "memory",
-    // "disk",
+    "custom/cpu",
+    "custom/gpu",
+    "memory",
+    "disk",
     "custom/power"
   ],
   "hyprland/workspaces": {
@@ -44,7 +44,7 @@
     "format": "{}",
     "icon": true,
     "icon-size": 20,
-    "max-length": 55,
+    "max-length": 30,
     "separate-outputs": true,
     "rewrite": {
       "": "Desktop",
@@ -72,7 +72,7 @@
     }
   },
   "custom/media": {
-    "format": "{icon} {}",
+    "format": "{icon} {text}",
     "max-length": 40,
     "format-icons": {
       "spotify": "",
