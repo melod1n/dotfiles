@@ -21,10 +21,11 @@
     "pulseaudio",
     // "network",
     "custom/bluetooth",
-    "custom/cpu",
-    "custom/gpu",
-    "memory",
-    "disk",
+    "battery",
+    // "custom/cpu",
+    // "custom/gpu",
+    // "memory",
+    // "disk",
     "custom/power"
   ],
   "hyprland/workspaces": {
@@ -129,10 +130,10 @@
     }
   },
   "network": {
-    "format-wifi": "   {essid}",
+    "format-wifi": "",
     "format-ethernet": "󰈀   {ipaddr}",
     "format-disconnected": "󰖪   offline",
-    "tooltip-format": "{ifname}: {ipaddr}"
+    "tooltip-format": "{ifname}: {essid}: {ipaddr}"
   },
   "custom/cpu": {
     "exec": "~/.config/waybar/scripts/cpu.sh",
