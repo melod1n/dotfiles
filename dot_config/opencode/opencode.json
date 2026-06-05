@@ -1,16 +1,13 @@
 {
   "$schema": "https://opencode.ai/config.json",
-
   "default_agent": "lead",
   "share": "manual",
   "snapshot": true,
-
   "permission": {
     "edit": "ask",
     "bash": "ask",
     "external_directory": "ask"
   },
-
   "mcp": {
     "context7": {
       "type": "remote",
@@ -21,14 +18,17 @@
       "enabled": true,
       "timeout": 10000
     },
-
+    "exa": {
+			"type": "remote",
+			"url": "https://mcp.exa.ai/mcp",
+			"enabled": true
+		},
     "gh_grep": {
       "type": "remote",
       "url": "https://mcp.grep.app",
       "enabled": true,
       "timeout": 10000
     },
-
     "sentry": {
       "type": "remote",
       "url": "https://mcp.sentry.dev/mcp",
@@ -36,22 +36,23 @@
       "enabled": false,
       "timeout": 10000
     },
-
     "playwright": {
       "type": "local",
-      "command": ["npx", "-y", "@playwright/mcp@latest"],
+      "command": [
+        "npx",
+        "-y",
+        "@playwright/mcp@latest"
+      ],
       "enabled": false,
       "timeout": 30000
     }
   },
-
   "tools": {
     "context7_*": false,
     "gh_grep_*": false,
     "sentry_*": false,
     "playwright_*": false
   },
-
   "agent": {
     "external-researcher": {
       "tools": {
@@ -59,35 +60,30 @@
         "gh_grep_*": true
       }
     },
-
     "architect": {
       "tools": {
         "context7_*": true,
         "gh_grep_*": true
       }
     },
-
     "kotlin-android": {
       "tools": {
         "context7_*": true,
         "gh_grep_*": true
       }
     },
-
     "backend": {
       "tools": {
         "context7_*": true,
         "gh_grep_*": true
       }
     },
-
     "devops": {
       "tools": {
         "context7_*": true,
         "gh_grep_*": true
       }
     },
-
     "ui-tui": {
       "tools": {
         "context7_*": true,
@@ -95,14 +91,12 @@
         "playwright_*": true
       }
     },
-
     "tester": {
       "tools": {
         "playwright_*": true
       }
     }
   },
-
   "watcher": {
     "ignore": [
       "node_modules/**",
@@ -117,35 +111,44 @@
       ".run/**"
     ]
   },
-
   "compaction": {
     "auto": true,
     "prune": false,
     "reserved": 10000
   },
-
   "lsp": true,
-
+  "instructions": [
+    "./tools/philosophy.md"
+  ],
   "plugin": [
     [
       "opencode-models-discovery",
       {
-        "smartModelName": false
+        "providers": {
+          "include": [
+            "llama.cpp"
+          ]
+        },
+        "discovery": {
+          "enabled": true,
+          "ttl": 15000
+        },
+        "smartModelName": true
       }
-    ]
+    ],
+    "@tarquinen/opencode-dcp@3.1.3",
+    "@franlol/opencode-md-table-formatter@0.0.6"
   ],
-
   "disabled_providers": [],
-
   "provider": {
     "llama.cpp": {
-      "name": "llama.cpp (Local)",
+      "name": "llama.cpp",
       "npm": "@ai-sdk/openai-compatible",
       "options": {
         "baseURL": "{env:LLAMA_CPP_URL}",
         "modelsDiscovery": {
           "enabled": true,
-          "endpoint": "/v1/models"
+          "endpoint": "/v1/models",
         }
       },
       "models": {}
