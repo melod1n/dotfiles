@@ -79,7 +79,7 @@ export PATH
 # Completion
 # -----------------------------
 
-autoload -Uz compinit
+autoload -Uz compinit && compinit
 mkdir -p "$HOME/.cache/zsh"
 compinit -d "$HOME/.cache/zsh/zcompdump"
 
