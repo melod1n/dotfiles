@@ -225,6 +225,7 @@ alias dcu='dc pull && dc up -d'
 alias gh='history | grep'
 alias neofetch='fastfetch'
 alias dfu='dotfiles-update'
+alias cf=': > '
 
 case "$OS" in
   Darwin)
