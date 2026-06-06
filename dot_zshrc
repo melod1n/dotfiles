@@ -253,7 +253,7 @@ fi
 
 # SSH-specific aliases
 if [[ -n "${SSH_CONNECTION:-}" ]]; then
-  alias hyprctl="$HOME/.local/bin/hyprctl-ssh"
+  #alias hyprctl="$HOME/.local/bin/hyprctl-ssh"
 fi
 
 # Optional external aliases
