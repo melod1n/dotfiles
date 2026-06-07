@@ -1,1 +1,24 @@
 include "/usr/share/nano/*.nanorc"
+set autoindent
+set constantshow
+set linenumbers
+set mouse
+set quickblank
+set regexp
+set indicator
+set minibar
+set boldtext
+set tabstospaces
+set tabsize 2
+set softwrap
+set atblanks
+set multibuffer
+set historylog
+set positionlog
+set bookstyle
+
+set titlecolor bold,white,blue       # Title bar colors
+set statuscolor bold,black,cyan      # Status bar colors
+set selectedcolor bold,black,yellow  # Selected text colors
+set numbercolor bold,white,green     # Line number colors
+set errorcolor bold,white,red        # Error message colors
