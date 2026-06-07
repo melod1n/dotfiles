@@ -35,6 +35,9 @@ fi
 export NVM_DIR="$HOME/.nvm"
 [[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh"
 
+[[ -d "/usr/local/go/bin" ]] && export PATH=$PATH:/usr/local/go/bin
+[[ -d "$HOME/go/bin" ]] && export PATH=$PATH:$HOME/go/bin
+
 export JENV_ROOT="$HOME/.jenv"
 path_prepend "$JENV_ROOT/bin"
 path_prepend "$HOME/.opencode/bin"
