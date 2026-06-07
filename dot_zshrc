@@ -33,14 +33,14 @@ OS="$(uname -s 2>/dev/null || echo unknown)"
 # -----------------------------
 
 path=(
-  "$HOME/.opencode/bin"
-  "$HOME/.jenv/bin",
-  "$HOME/.local/bin",
   $path
 )
 
 [[ -d /usr/local/go/bin ]] && path+=(/usr/local/go/bin)
 [[ -d $HOME/.bun/bin ]] && path+=($HOME/.bun/bin)
+[[ -d $HOME/.local/bin ]] && path+=($HOME/.local/bin)
+[[ -d $HOME/.opencode/bin ]] && path+=($HOME/.opencode/bin)
+[[ -d $HOME/.jenv/bin ]] && path+=($HOME/.jenv/bin)
 
 export JENV_ROOT="$HOME/.jenv"
 export NVM_DIR="$HOME/.nvm"
