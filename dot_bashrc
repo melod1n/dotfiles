@@ -61,3 +61,7 @@ case "$OS" in
 esac
 
 export PATH
+
+if [ -f ".bashrc.local" ]; then
+  source ".bashrc.local"
+fi
