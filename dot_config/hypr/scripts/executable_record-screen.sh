@@ -7,7 +7,7 @@ OUTFILE="$RUNTIME_DIR/wf-recorder-region.path"
 LOGFILE="$RUNTIME_DIR/wf-recorder-region.log" # Перенесено в изолированный RUNTIME_DIR
 
 notify() {
-    command -v notify-send >/dev/null 2>&1 && notify-send "$@" -t 1500
+    command -v notify-send >/dev/null 2>&1 && notify-send "$@" -t 2500
 }
 
 is_recording() {
@@ -39,18 +39,16 @@ if is_recording; then
 fi
 
 PICTURES_DIR="$(xdg-user-dir PICTURES 2>/dev/null || echo "$HOME/Pictures")"
+
+# TODO: add folder with current date
 SAVE_DIR="$PICTURES_DIR/Screenshots"
 mkdir -p "$SAVE_DIR"
 
 FILE="$SAVE_DIR/recording-$(date +'%Y-%m-%d_%H-%M-%S').mp4"
 
-GEOMETRY="$(slurp -f '%g')" || exit 0
-[[ -n "$GEOMETRY" ]] || exit 0
+notify "Запись началась" "Super + Shift + Print — остановить"
 
-notify "Запись началась" "Ctrl + Shift + Print — остановить"
-
-# Лог теперь пишется в системную runtime-директорию вместе с PID-файлами
-wf-recorder -g "$GEOMETRY" -f "$FILE" >"$LOGFILE" 2>&1 &
+wf-recorder -f "$FILE" >"$LOGFILE" 2>&1 &
 pid="$!"
 
 echo "$pid" > "$PIDFILE"
