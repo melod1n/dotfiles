@@ -4,29 +4,29 @@
   "share": "manual",
   "snapshot": true,
   "permission": {
-    "read": "ask",
-  "edit": "ask",
-  "bash": "ask",
-  "external_directory": "ask",
-  "todowrite": "allow",
+    "read": "allow",
+    "edit": "allow",
+    "bash": "ask",
+    "external_directory": "ask",
+    "todowrite": "allow",
 
-  // Web & Network Access
-  "webfetch": "allow",
-  "websearch": "allow",
+    // Web & Network Access
+    "webfetch": "allow",
+    "websearch": "allow",
 
-  // Agent Capabilities
-  "task": "allow",
-  "skill": "allow",
+    // Agent Capabilities
+    "task": "allow",
+    "skill": "allow",
 
-  // Search & Introspection
-  "glob": "allow",
-  "grep": "allow",
-  "list": "allow",
+    // Search & Introspection
+    "glob": "allow",
+    "grep": "allow",
+    "list": "allow",
 
-  // Interaction & Safety
-  "question": "allow",
-  "doom_loop": "ask",
-  "lsp": "allow"
+    // Interaction & Safety
+    "question": "allow",
+    "doom_loop": "ask",
+    "lsp": "allow"
   },
   "mcp": {
     "context7": {
