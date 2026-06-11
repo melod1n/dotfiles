@@ -1,4 +1,8 @@
+{{- if eq .chezmoi.os "darwin" -}}
+include "/opt/homebrew/share/nano/*.nanorc"
+{{- else -}}
 include "/usr/share/nano/*.nanorc"
+{{- end -}}
 set autoindent
 set constantshow
 set linenumbers
