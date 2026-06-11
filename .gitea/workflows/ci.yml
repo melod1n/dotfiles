@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install shellcheck
-        run: sudo apt-get update && sudo apt-get install -y shellcheck
+        run: apt-get update && apt-get install -y shellcheck
       - name: Lint shell scripts
         run: shellcheck dot_local/bin/* dot_config/hypr/notify/*.sh
 
