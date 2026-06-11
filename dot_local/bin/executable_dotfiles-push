@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DOT_NOTIFY="$HOME/.local/bin/dot-notify"
+
+notify() {
+  local type="$1"
+  local title="$2"
+  local body="${3:-}"
+
+  if [[ -x "$DOT_NOTIFY" ]]; then
+    "$DOT_NOTIFY" "$type" "$title" "$body" || true
+  else
+    printf '[%s] %s\n%s\n' "$type" "$title" "$body" >&2
+  fi
+}
+
+fail() {
+  notify error "Dotfiles push failed" "$1"
+  exit 1
+}
+
+need_cmd() {
+  command -v "$1" >/dev/null 2>&1 || fail "Missing command: $1"
+}
+
+need_cmd chezmoi
+need_cmd git
+
+SOURCE_DIR="$(chezmoi source-path 2>/dev/null || true)"
+
+[[ -n "$SOURCE_DIR" ]] || fail "Cannot detect chezmoi source path"
+[[ -d "$SOURCE_DIR/.git" ]] || fail "Chezmoi source is not a git repository: $SOURCE_DIR"
+
+cd "$SOURCE_DIR"
+
+if git diff --quiet && git diff --cached --quiet; then
+  notify normal "Dotfiles push skipped" "No changes to commit"
+  exit 0
+fi
+
+COMMIT_MESSAGE="${1:-chore: update dotfiles}"
+
+notify normal "Pushing dotfiles" "Staging, committing, and pushing changes..."
+
+git add -A
+git commit -m "$COMMIT_MESSAGE"
+git push origin HEAD
+
+notify success "Dotfiles pushed" "$COMMIT_MESSAGE"

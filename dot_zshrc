@@ -227,6 +227,7 @@ alias gh='history | grep'
 alias mdt='md-tui'
 alias neofetch='fastfetch'
 alias dfu='dotfiles-update'
+alias dfp='dotfiles-push'
 alias cf=': > '
 
 case "$OS" in
