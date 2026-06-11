@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-DOT_NOTIFY="$HOME/.local/bin/dot-notify"
 LOCK_DIR="${XDG_RUNTIME_DIR:-${TMPDIR:-/tmp}}/dotfiles-update.lock.d"
-DOTFILES_NOTIFY="$DOT_NOTIFY"
-DOTFILES_TITLE="Dotfiles update"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=dotfiles-common.sh
