@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install shellcheck
-        run: curl -L https://github.com/koalaman/shellcheck/releases/download/stable/shellcheck-stable.linux.x86_64.tar.xz -o shellcheck.tar.xz && tar -xzvf shellcheck.tar.xz && mv ./shellcheck-stable ./shellcheck  && chmod +x ./shellcheck
+        run: curl -L https://github.com/koalaman/shellcheck/releases/download/stable/shellcheck-stable.linux.x86_64.tar.xz -o shellcheck.tar.xz && tar -xJvf shellcheck.tar.xz && mv ./shellcheck-stable ./shellcheck  && chmod +x ./shellcheck
       - name: Lint shell scripts
         run: ./shellcheck dot_local/bin/* dot_config/hypr/notify/*.sh --check-sourced
 
