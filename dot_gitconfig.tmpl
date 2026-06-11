@@ -1,0 +1,14 @@
+[user]
+	name = Danil Nikolaev
+	email = lischenkodev@gmail.com
+[credential]
+{{- if eq .chezmoi.os "darwin" }}
+	helper = osxkeychain
+{{- else if eq .chezmoi.os "linux" }}
+	# libsecret is the least-bad practical choice on Linux for desktop credential storage.
+	helper = libsecret
+{{- else }}
+	helper = store
+{{- end }}
+[core]
+	autocrlf = input

@@ -2,49 +2,30 @@
 set -euo pipefail
 
 DOT_NOTIFY="$HOME/.local/bin/dot-notify"
+DOTFILES_NOTIFY="$DOT_NOTIFY"
+DOTFILES_TITLE="Dotfiles push"
 
-notify() {
-  local type="$1"
-  local title="$2"
-  local body="${3:-}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=dotfiles-common.sh
+. "$SCRIPT_DIR/dotfiles-common.sh"
+dotfiles_need_cmd chezmoi
+dotfiles_need_cmd git
 
-  if [[ -x "$DOT_NOTIFY" ]]; then
-    "$DOT_NOTIFY" "$type" "$title" "$body" || true
-  else
-    printf '[%s] %s\n%s\n' "$type" "$title" "$body" >&2
-  fi
-}
-
-fail() {
-  notify error "Dotfiles push failed" "$1"
-  exit 1
-}
-
-need_cmd() {
-  command -v "$1" >/dev/null 2>&1 || fail "Missing command: $1"
-}
-
-need_cmd chezmoi
-need_cmd git
-
-SOURCE_DIR="$(chezmoi source-path 2>/dev/null || true)"
-
-[[ -n "$SOURCE_DIR" ]] || fail "Cannot detect chezmoi source path"
-[[ -d "$SOURCE_DIR/.git" ]] || fail "Chezmoi source is not a git repository: $SOURCE_DIR"
+SOURCE_DIR="$(dotfiles_source_dir)"
 
 cd "$SOURCE_DIR"
 
 if git diff --quiet && git diff --cached --quiet; then
-  notify normal "Dotfiles push skipped" "No changes to commit"
+  dotfiles_notify normal "Dotfiles push skipped" "No changes to commit"
   exit 0
 fi
 
 COMMIT_MESSAGE="${1:-chore: update dotfiles}"
 
-notify normal "Pushing dotfiles" "Staging, committing, and pushing changes..."
+dotfiles_notify normal "Dotfiles push" "Staging, committing, and pushing changes..."
 
 git add -A
 git commit -m "$COMMIT_MESSAGE"
 git push origin HEAD
 
-notify success "Dotfiles pushed" "$COMMIT_MESSAGE"
+dotfiles_notify success "Dotfiles push complete" "$COMMIT_MESSAGE"

@@ -1,7 +1,0 @@
-[user]
-	name = Danil Nikolaev
-	email = lischenkodev@gmail.com
-[credential]
-	helper = store
-[core]
-	autocrlf = input

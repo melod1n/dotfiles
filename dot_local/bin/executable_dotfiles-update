@@ -3,33 +3,18 @@ set -euo pipefail
 
 DOT_NOTIFY="$HOME/.local/bin/dot-notify"
 LOCK_DIR="${XDG_RUNTIME_DIR:-${TMPDIR:-/tmp}}/dotfiles-update.lock.d"
+DOTFILES_NOTIFY="$DOT_NOTIFY"
+DOTFILES_TITLE="Dotfiles update"
 
-notify() {
-  local type="$1"
-  local title="$2"
-  local body="${3:-}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=dotfiles-common.sh
+. "$SCRIPT_DIR/dotfiles-common.sh"
 
-  if [[ -x "$DOT_NOTIFY" ]]; then
-    "$DOT_NOTIFY" "$type" "$title" "$body" || true
-  else
-    printf '[%s] %s\n%s\n' "$type" "$title" "$body" >&2
-  fi
-}
-
-fail() {
-  notify error "Dotfiles update failed" "$1"
-  exit 1
-}
-
-need_cmd() {
-  command -v "$1" >/dev/null 2>&1 || fail "Missing command: $1"
-}
-
-need_cmd chezmoi
-need_cmd git
+dotfiles_need_cmd chezmoi
+dotfiles_need_cmd git
 
 if ! mkdir "$LOCK_DIR" 2>/dev/null; then
-  notify normal "Dotfiles update skipped" "Another update is already running"
+  dotfiles_notify normal "Dotfiles update skipped" "Another update is already running"
   exit 0
 fi
 
@@ -39,23 +24,20 @@ cleanup() {
 
 trap cleanup EXIT INT TERM
 
-SOURCE_DIR="$(chezmoi source-path 2>/dev/null || true)"
+SOURCE_DIR="$(dotfiles_source_dir)"
 
-[[ -n "$SOURCE_DIR" ]] || fail "Cannot detect chezmoi source path"
-[[ -d "$SOURCE_DIR/.git" ]] || fail "Chezmoi source is not a git repository: $SOURCE_DIR"
-
-notify normal "Updating dotfiles" "Pulling latest changes..."
+dotfiles_notify normal "Dotfiles update" "Pulling latest changes..."
 
 cd "$SOURCE_DIR"
 
 CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo unknown)"
 
 if ! git rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1; then
-  fail "Current branch has no upstream: $CURRENT_BRANCH"
+  dotfiles_fail "Current branch has no upstream: $CURRENT_BRANCH"
 fi
 
 if ! git diff --quiet || ! git diff --cached --quiet; then
-  notify important "Dotfiles have local changes" "Pull will use --autostash"
+  dotfiles_notify important "Dotfiles update" "Local changes detected; pull will use --autostash"
 fi
 
 git fetch --prune
@@ -72,12 +54,8 @@ else
   PULL_STATUS="Updated $BEFORE → $AFTER"
 fi
 
-notify normal "Applying dotfiles" "$PULL_STATUS"
+dotfiles_notify normal "Dotfiles update" "Applying dotfiles: $PULL_STATUS"
 
 chezmoi apply -v
 
-if [[ -x "$HOME/.local/bin/theme-deps-check" ]]; then
-  "$HOME/.local/bin/theme-deps-check" || true
-fi
-
-notify success "Dotfiles updated" "$PULL_STATUS"
+dotfiles_notify success "Dotfiles update complete" "$PULL_STATUS"
