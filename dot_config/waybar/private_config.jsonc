@@ -12,8 +12,8 @@
   ],
   "modules-center": [
     "clock",
-    "custom/media",
-    "custom/weather"
+    "custom/weather",
+    "custom/media"
   ],
   "modules-right": [
     "tray",
@@ -56,8 +56,7 @@
   },
   "clock": {
     "timezone": "Europe/Moscow",
-    "format": "   {:%H:%M}",
-    "format-alt": "󰃭   {:%A, %B %d, %Y}",
+    "format": "{:%H:%M   %a %d.%m.%Y}",
     "on-click": "~/.config/waybar/scripts/toggle-calendar.sh",
     "on-click-right": "~/.config/waybar/scripts/toggle-calendar.sh",
     "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
@@ -74,15 +73,11 @@
     }
   },
   "custom/media": {
-    "format": "{icon} {text}",
-    "max-length": 40,
-    "format-icons": {
-      "spotify": "",
-      "default": "🎜"
-    },
-    "escape": true,
-    "return-type": "json",
-    "exec": "playerctl -F metadata --format '{\"text\": \"{{artist}} - {{title}}\", \"class\": \"{{playerName}}\"}' 2> /dev/null",
+    "exec": "~/.config/waybar/scripts/media.sh",
+    "format": "  ",
+    "hide-empty-text": true,
+    "tooltip-format": "{text}",
+    "interval": 2,
     "on-click": "playerctl play-pause",
     "on-scroll-up": "playerctl next",
     "on-scroll-down": "playerctl previous"
@@ -94,11 +89,11 @@
     "exec": "bluetoothctl show | grep -q 'Powered: yes' && echo '   On' || echo '   Off'"
   },
   "custom/weather": {
-    "format": "{}°",
-    "tooltip": true,
+    "format": "{}",
+    "tooltip": false,
     "interval": 3600,
     "exec": "curl -s 'wttr.in/Krasnodar?format=%c%t'",
-    "exec-if": "ping -c 1 8.8.8.8 > /dev/null"
+    "exec-if": "ping -c 1 1.1.1.1 > /dev/null"
   },
   "hyprland/language": {
     "keyboard-name": "gaming-keyboard",

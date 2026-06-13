@@ -65,6 +65,19 @@ window#waybar {
     min-width: 16px;
 }
 
+#custom-media {
+  background: #8b5cf6;
+  transition: background 0.15s ease-in-out;
+}
+
+#custom-media:hover {
+  background: #b00b69;
+}
+
+#clock:hover {
+    background: #b00b69;
+}
+
 #custom-bluetooth {
   font-size: 14px;
 }
@@ -73,7 +86,7 @@ window#waybar {
     background: #8b5cf6;
     color: white;
     padding: 3px 15px;
-    transition: background 0.25s ease-in-out;
+    transition: background 0.15s ease-in-out;
 }
 
 #clock:hover {
