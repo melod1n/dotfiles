@@ -11,7 +11,7 @@ BORDER_SIZE=4
 BORDER_COLOR="ff5555ff"
 
 notify() {
-    command -v notify-send >/dev/null 2>&1 && notify-send "$@" -t 2500
+    $HOME/.config/hypr/notify/notify.sh normal "$@"
 }
 
 is_recording() {

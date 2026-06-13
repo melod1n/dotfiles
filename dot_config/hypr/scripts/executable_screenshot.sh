@@ -9,4 +9,4 @@ file="$dir/screenshot-$(date +%Y%m%d-%H%M%S).png"
 grim "$file"
 wl-copy --type image/png < "$file"
 
-notify-send "Screenshot" "$file" -t 1500
+$HOME/.config/hypr/notify/notify.sh normal "Screenshot" "$file"

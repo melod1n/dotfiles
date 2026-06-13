@@ -7,7 +7,7 @@ OUTFILE="$RUNTIME_DIR/wf-recorder-region.path"
 LOGFILE="$RUNTIME_DIR/wf-recorder-region.log" # Перенесено в изолированный RUNTIME_DIR
 
 notify() {
-    command -v notify-send >/dev/null 2>&1 && notify-send "$@" -t 2500
+    $HOME/.config/hypr/notify/notify.sh normal "$@"
 }
 
 is_recording() {

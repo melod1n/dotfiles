@@ -13,7 +13,7 @@ TITLE="${2:-Notification}"
 BODY="${3:-}"
 
 case "$TYPE" in
-  theme)
+  low)
     URGENCY="low"
     TIMEOUT="${DOT_NOTIFY_THEME_MS:-1500}"
     HYPR_ICON=1

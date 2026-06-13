@@ -21,4 +21,4 @@ geom="$(slurp -d)" || exit 0
 grim -g "$geom" "$file"
 wl-copy --type image/png < "$file"
 
-notify-send "Screenshot" "$file" -t 1500
+$HOME/.config/hypr/notify/notify.sh normal "Screenshot" "$file"
