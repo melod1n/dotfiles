@@ -2,7 +2,7 @@
 description: Reviews and designs terminal UI, keyboard navigation, focus handling, command palettes, dialogs, and visual hierarchy
 mode: subagent
 temperature: 0.2
-steps: 10
+steps: 500
 permission:
   read: allow
   list: allow

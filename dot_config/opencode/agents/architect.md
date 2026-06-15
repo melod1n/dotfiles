@@ -2,7 +2,7 @@
 description: Designs minimal architecture changes, boundaries, state models, and migration plans without editing
 mode: subagent
 temperature: 0.15
-steps: 8
+steps: 500
 permission:
   read: allow
   list: allow

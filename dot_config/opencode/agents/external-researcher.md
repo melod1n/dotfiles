@@ -2,7 +2,7 @@
 description: Read-only external researcher for official docs, upstream source, dependency behavior, and current tool behavior
 mode: subagent
 temperature: 0.1
-steps: 8
+steps: 500
 permission:
   read: allow
   list: allow

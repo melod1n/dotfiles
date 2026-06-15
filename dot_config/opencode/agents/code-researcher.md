@@ -2,7 +2,7 @@
 description: Read-only local codebase researcher for finding files, call sites, patterns, and existing architecture
 mode: subagent
 temperature: 0.1
-steps: 8
+steps: 500
 permission:
   read: allow
   list: allow

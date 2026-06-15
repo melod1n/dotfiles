@@ -2,7 +2,7 @@
 description: Implements focused code changes after research or architecture is clear
 mode: subagent
 temperature: 0.25
-steps: 16
+steps: 500
 permission:
   read: allow
   list: allow

@@ -2,7 +2,7 @@
 description: Orchestrates work, breaks tasks into subtasks, delegates to specialized agents, and keeps the main context clean
 mode: primary
 temperature: 0.2
-steps: 12
+steps: 500
 permission:
   edit: deny
   bash: ask

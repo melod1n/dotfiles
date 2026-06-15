@@ -2,7 +2,7 @@
 description: Kotlin, Android, Jetpack Compose, Compose Multiplatform, Gradle, Room, Ktor client, and mobile architecture specialist
 mode: subagent
 temperature: 0.15
-steps: 12
+steps: 500
 permission:
   read: allow
   list: allow

@@ -2,7 +2,7 @@
 description: Reviews diffs for bugs, regressions, architecture issues, security issues, and unnecessary changes
 mode: subagent
 temperature: 0.1
-steps: 8
+steps: 500
 permission:
   read: allow
   list: allow

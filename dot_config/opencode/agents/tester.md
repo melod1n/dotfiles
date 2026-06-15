@@ -2,7 +2,7 @@
 description: Designs and runs verification steps, tests, reproduction scenarios, and regression checks
 mode: subagent
 temperature: 0.1
-steps: 12
+steps: 500
 permission:
   read: allow
   list: allow

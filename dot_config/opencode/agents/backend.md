@@ -2,7 +2,7 @@
 description: Backend specialist for Ktor, Exposed, Postgres, migrations, APIs, validation, transactions, and service architecture
 mode: subagent
 temperature: 0.15
-steps: 12
+steps: 500
 permission:
   read: allow
   list: allow

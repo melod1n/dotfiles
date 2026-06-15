@@ -2,7 +2,7 @@
 description: DevOps specialist for Docker, docker compose, systemd, Linux, CI/CD, self-hosted services, networking, and deployment safety
 mode: subagent
 temperature: 0.15
-steps: 10
+steps: 500
 permission:
   read: allow
   list: allow
