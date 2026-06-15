@@ -29,6 +29,15 @@
     "lsp": "allow"
   },
   "mcp": {
+    "thunderbird": {
+      "type": "local",
+      "command": [
+        "node",
+        "/Users/meloda/Workspace/thunderbird-mcp/mcp-bridge.cjs"
+      ],
+      "enabled": true,
+      "timeout": 30000
+    },
     "context7": {
       "type": "remote",
       "url": "https://mcp.context7.com/mcp",
@@ -74,37 +83,52 @@
     "playwright_*": false
   },
   "agent": {
+    "Lead": {
+      "steps": 500
+    },
+    "Build": {
+      "steps": 500
+    },
+    "Plan": {
+      "steps": 500
+    },
     "external-researcher": {
+      "steps": 500,
       "tools": {
         "context7_*": true,
         "gh_grep_*": true
       }
     },
     "architect": {
+      "steps": 500,
       "tools": {
         "context7_*": true,
         "gh_grep_*": true
       }
     },
     "kotlin-android": {
+      "steps": 500,
       "tools": {
         "context7_*": true,
         "gh_grep_*": true
       }
     },
     "backend": {
+      "steps": 500,
       "tools": {
         "context7_*": true,
         "gh_grep_*": true
       }
     },
     "devops": {
+      "steps": 500,
       "tools": {
         "context7_*": true,
         "gh_grep_*": true
       }
     },
     "ui-tui": {
+      "steps": 500,
       "tools": {
         "context7_*": true,
         "gh_grep_*": true,
@@ -112,6 +136,7 @@
       }
     },
     "tester": {
+      "steps": 500,
       "tools": {
         "playwright_*": true
       }
