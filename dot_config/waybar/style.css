@@ -56,7 +56,9 @@ window#waybar {
 #disk,
 #battery,
 #custom-power,
-#custom-theme {
+#custom-theme,
+#custom-info,
+#window {
     background: rgba(255, 255, 255, 0.075);
     color: #e6e6f0;
     border-radius: 999px;
