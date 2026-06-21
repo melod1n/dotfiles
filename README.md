@@ -1,3 +1,1 @@
-# dotfiles
-
-## This repository contains my dotfiles for my main PC running Arch Linux with Hyprland.
+# This repository contains my dotfiles for my main PC running Arch Linux with Hyprland.
