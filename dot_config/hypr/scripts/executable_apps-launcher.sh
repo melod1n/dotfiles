@@ -4,8 +4,8 @@ set -uo pipefail
 LAUNCH_FLOATING="${1:-false}"
 PROCESS_NAME="apps-fuzzel-menu"
 
-if pgrep -u "$USER" -f "apps-fuzzel-menu" >/dev/null; then
-  pkill -u "$USER" -f "apps-fuzzel-menu" 2>/dev/null
+if pgrep -u "$USER" -f "$PROCESS_NAME" >/dev/null; then
+  pkill -u "$USER" -f "$PROCESS_NAME" 2>/dev/null
   exit 0
 fi
 
@@ -22,10 +22,3 @@ if [[ "$LAUNCH_FLOATING" == "true" ]]; then
 fi
 
 exec -a "$PROCESS_NAME" fuzzel "${fuzzel_args[@]}"
-
-# bash -c '
-#   exec -a apps-fuzzel-menu fuzzel \
-#     --prompt="> " \
-#     --width=45 \
-#     --lines=20
-# '
