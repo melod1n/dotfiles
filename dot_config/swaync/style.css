@@ -1,0 +1,675 @@
+/*
+ * SwayNC 0.12.x theme matching the current Waybar theme.
+ *
+ * The important fixes here are:
+ *   - no background on the MPRIS carousel arrow/image, because GTK stretches it
+ *     to the full player height and turns a "circle" into a giant vertical pill;
+ *   - a genuinely thin, low-contrast scrollbar;
+ *   - playback buttons and the DND switch are styled independently instead of
+ *     relying on broad button rules;
+ *   - no global box-shadow/outline reset on every GTK widget.
+ */
+
+:root {
+  --cc-bg: rgba(17, 17, 27, 0.88);
+
+  --surface: rgba(255, 255, 255, 0.075);
+  --surface-hover: rgba(255, 255, 255, 0.12);
+  --surface-active: rgba(139, 92, 246, 0.22);
+  --surface-solid: rgba(17, 17, 27, 0.96);
+
+  /* Notifications should read as cards, not as glass overlays. */
+  --notification-surface: rgba(34, 34, 48, 0.96);
+  --notification-surface-hover: rgba(40, 40, 56, 0.98);
+  --notification-content-hover: rgba(255, 255, 255, 0.045);
+
+  --noti-bg: 255, 255, 255;
+  --noti-bg-alpha: 0.075;
+  --noti-bg-darker: rgba(17, 17, 27, 0.96);
+  --noti-bg-hover: rgba(255, 255, 255, 0.12);
+  --noti-bg-focus: rgba(139, 92, 246, 0.18);
+  --noti-border-color: rgba(255, 255, 255, 0.09);
+  --noti-close-bg: rgba(255, 255, 255, 0.09);
+  --noti-close-bg-hover: #b00b69;
+
+  --text-color: #e6e6f0;
+  --text-color-secondary: #c9c9d8;
+  --text-color-disabled: #8f8fa3;
+
+  --accent: #8b5cf6;
+  --accent-hover: #b00b69;
+  --danger: #ef4444;
+  --bg-selected: var(--accent);
+
+  --notification-icon-size: 52px;
+  --notification-app-icon-size: 18px;
+  --notification-group-icon-size: 24px;
+
+  --border: 1px solid var(--noti-border-color);
+  --border-radius: 18px;
+  --control-radius: 24px;
+
+  --notification-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+
+  --font-size-body: 13px;
+  --font-size-summary: 13px;
+
+  --hover-transition: background-color 150ms ease-in-out,
+                      color 150ms ease-in-out,
+                      border-color 150ms ease-in-out;
+  --hover-tranistion: var(--hover-transition);
+
+  --mpris-album-art-overlay: rgba(17, 17, 27, 0.74);
+  --mpris-button-hover: rgba(255, 255, 255, 0.14);
+  --mpris-album-art-icon-size: 96px;
+  --mpris-album-art-shadow: 0 8px 24px rgba(0, 0, 0, 0.38);
+}
+
+/* --------------------------------------------------------------------------
+ * Base
+ * -------------------------------------------------------------------------- */
+
+* {
+  font-family: "Inter", "JetBrainsMono Nerd Font", "Symbols Nerd Font Mono",
+               "Symbols Nerd Font", "Font Awesome 6 Free", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  text-shadow: none;
+}
+
+notificationwindow,
+blankwindow,
+.blank-window,
+.floating-notifications {
+  background: transparent;
+}
+
+button,
+switch,
+scrollbar,
+scrollbar slider {
+  background-image: none;
+}
+
+/* --------------------------------------------------------------------------
+ * Control center
+ * -------------------------------------------------------------------------- */
+
+.control-center {
+  color: var(--text-color);
+  background: var(--cc-bg);
+  border: var(--border);
+  border-radius: var(--control-radius);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
+  padding: 7px;
+}
+
+.control-center-list,
+.control-center-list > viewport,
+.control-center-list > viewport > box {
+  background: transparent;
+}
+
+.control-center-list-placeholder,
+.control-center-list-placeholder label {
+  color: var(--text-color-disabled);
+  opacity: 1;
+}
+
+.widget {
+  margin: 4px;
+  padding: 8px;
+  background: transparent;
+  border-radius: var(--border-radius);
+}
+
+/* --------------------------------------------------------------------------
+ * Header
+ * -------------------------------------------------------------------------- */
+
+.widget-title {
+  margin: 4px;
+  padding: 5px 5px 5px 12px;
+  background: var(--surface);
+  border: var(--border);
+  border-radius: 999px;
+}
+
+.widget-title > label {
+  color: var(--text-color);
+  font-size: 15px;
+  font-weight: 600;
+  margin-right: 10px;
+}
+
+.widget-title > button {
+  min-height: 30px;
+  padding: 3px 14px;
+  margin: 0;
+  color: #ffffff;
+  background-color: var(--accent);
+  border: none;
+  border-radius: 999px;
+  box-shadow: none;
+  transition: var(--hover-transition);
+}
+
+.widget-title > button:hover {
+  background-color: var(--accent-hover);
+}
+
+.widget-title > button:active {
+  background-color: var(--accent);
+}
+
+/* --------------------------------------------------------------------------
+ * Do Not Disturb
+ * -------------------------------------------------------------------------- */
+
+.widget-dnd {
+  margin: 4px;
+  padding: 8px 11px;
+  background: var(--surface);
+  border: var(--border);
+  border-radius: 999px;
+}
+
+.widget-dnd label {
+  color: var(--text-color);
+  font-size: 13px;
+  margin-right: 10px;
+}
+
+.widget-dnd > switch,
+.widget-dnd > switch.control-center-dnd {
+  min-width: 44px;
+  min-height: 24px;
+  margin: 0;
+  padding: 2px;
+  color: transparent;
+  background-color: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  box-shadow: none;
+  outline: none;
+  transition: var(--hover-transition);
+}
+
+.widget-dnd > switch:hover {
+  background-color: rgba(255, 255, 255, 0.23);
+}
+
+.widget-dnd > switch:checked {
+  background-color: var(--accent);
+  border-color: transparent;
+}
+
+.widget-dnd > switch:checked:hover {
+  background-color: var(--accent-hover);
+}
+
+.widget-dnd > switch > slider {
+  min-width: 18px;
+  min-height: 18px;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4fb;
+  border: none;
+  border-radius: 999px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.32);
+}
+
+/* --------------------------------------------------------------------------
+ * MPRIS
+ * -------------------------------------------------------------------------- */
+
+.widget-mpris {
+  margin: 4px;
+  padding: 0;
+  background: transparent;
+}
+
+.widget-mpris > box {
+  background: transparent;
+}
+
+.widget-mpris-player {
+  margin: 4px 0;
+  color: var(--text-color);
+  background: var(--surface-solid);
+  border: var(--border);
+  border-radius: var(--control-radius);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.34);
+}
+
+.widget-mpris-player .mpris-background {
+  filter: blur(16px);
+  opacity: 0.62;
+}
+
+.widget-mpris-player .mpris-overlay {
+  padding: 14px;
+  background-color: var(--mpris-album-art-overlay);
+  border-radius: var(--control-radius);
+}
+
+.widget-mpris-album-art {
+  -gtk-icon-size: var(--mpris-album-art-icon-size);
+  margin-right: 13px;
+  border-radius: 17px;
+  box-shadow: var(--mpris-album-art-shadow);
+}
+
+.widget-mpris-title {
+  color: var(--text-color);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.widget-mpris-subtitle {
+  color: var(--text-color-secondary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Playback controls. These live inside the player and do not stretch. */
+.widget-mpris-player .mpris-overlay > box > button {
+  min-width: 36px;
+  min-height: 36px;
+  margin: 2px 3px;
+  padding: 0;
+  color: var(--text-color);
+  background-color: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 999px;
+  box-shadow: none;
+  outline: none;
+  transition: var(--hover-transition);
+}
+
+.widget-mpris-player .mpris-overlay > box > button:hover {
+  color: #ffffff;
+  background-color: var(--accent-hover);
+  border-color: transparent;
+}
+
+.widget-mpris-player .mpris-overlay > box > button:active {
+  background-color: var(--accent);
+}
+
+.widget-mpris-player .mpris-overlay > box > button:disabled {
+  color: var(--text-color-disabled);
+  background-color: rgba(255, 255, 255, 0.04);
+  border-color: transparent;
+  opacity: 0.5;
+}
+
+.widget-mpris-player .mpris-overlay > box > button > image {
+  -gtk-icon-size: 16px;
+  min-width: 16px;
+  min-height: 16px;
+  margin: 0;
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  -gtk-icon-transform: none;
+}
+
+/*
+ * The current icon theme renders the skip glyphs with uneven padding and the
+ * old CSS transforms made them blurry. Use two mirrored 16×16 SVGs instead.
+ * The middle icon remains theme-provided so play/pause continues to switch.
+ */
+.widget-mpris-player .mpris-overlay > box > button:first-child > image {
+  -gtk-icon-source: url("icons/media-skip-backward-symbolic.svg");
+}
+
+.widget-mpris-player .mpris-overlay > box > button:nth-child(2) > image {
+  -gtk-icon-transform: none;
+}
+
+.widget-mpris-player .mpris-overlay > box > button:last-child > image {
+  -gtk-icon-source: url("icons/media-skip-forward-symbolic.svg");
+}
+
+/*
+ * Carousel arrows.
+ * GTK stretches these buttons/images to the player height. Any background on
+ * either widget becomes the giant purple vertical pill seen in the screenshot.
+ * Keep the hit area transparent and style only the glyph color.
+ */
+.widget-mpris > box > button {
+  min-width: 28px;
+  min-height: 0;
+  margin: 0 2px;
+  padding: 0;
+  color: var(--text-color-disabled);
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  outline: none;
+  opacity: 0.72;
+  transition: color 150ms ease-in-out, opacity 150ms ease-in-out;
+}
+
+.widget-mpris > box > button > image {
+  -gtk-icon-size: 18px;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.widget-mpris > box > button:hover {
+  color: var(--accent);
+  background: transparent;
+  opacity: 1;
+}
+
+.widget-mpris > box > button:active {
+  color: var(--accent-hover);
+  background: transparent;
+}
+
+.widget-mpris > box > button:disabled {
+  color: rgba(143, 143, 163, 0.45);
+  background: transparent;
+  opacity: 0.35;
+}
+
+/* --------------------------------------------------------------------------
+ * Notifications
+ * -------------------------------------------------------------------------- */
+
+.notification-row,
+.notification-row:focus,
+.notification-group,
+.notification-group:focus {
+  background: transparent;
+  outline: none;
+}
+
+.notification-background {
+  padding: 4px;
+}
+
+.notification {
+  color: var(--text-color);
+  background: var(--notification-surface);
+  border: var(--border);
+  border-radius: var(--border-radius);
+  padding: 0;
+  box-shadow: var(--notification-shadow);
+  transition: var(--hover-transition);
+}
+
+.notification:hover {
+  background: var(--notification-surface-hover);
+}
+
+.notification.low,
+.notification.normal {
+  border-color: var(--noti-border-color);
+}
+
+.notification.critical {
+  background: rgba(63, 31, 40, 0.97);
+  border-color: rgba(239, 68, 68, 0.72);
+}
+
+.notification-default-action {
+  color: var(--text-color);
+  background: transparent;
+  border: none;
+  border-radius: var(--border-radius);
+  padding: 6px;
+  box-shadow: none;
+  transition: var(--hover-transition);
+}
+
+.notification-default-action:hover {
+  background: var(--notification-content-hover);
+}
+
+.notification-default-action:not(:only-child) {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.notification-content {
+  color: var(--text-color);
+  background: transparent;
+  border-radius: var(--border-radius);
+  padding: 2px;
+}
+
+.notification-content .image {
+  -gtk-icon-size: var(--notification-icon-size);
+  margin: 5px;
+  border-radius: 14px;
+}
+
+.notification-content .app-icon {
+  -gtk-icon-size: var(--notification-app-icon-size);
+  margin: 5px;
+}
+
+.notification-content .summary {
+  color: var(--text-color);
+  font-size: var(--font-size-summary);
+  font-weight: 600;
+  background: transparent;
+}
+
+.notification-content .body {
+  color: var(--text-color-secondary);
+  font-size: var(--font-size-body);
+  font-weight: 500;
+  background: transparent;
+}
+
+.notification-content .time {
+  color: var(--text-color-disabled);
+  font-size: 11px;
+  font-weight: 600;
+  background: transparent;
+  margin-right: 26px;
+}
+
+.close-button {
+  min-width: 24px;
+  min-height: 24px;
+  margin-top: 8px;
+  margin-right: 8px;
+  padding: 0;
+  color: var(--text-color);
+  background-color: var(--noti-close-bg);
+  border: none;
+  border-radius: 999px;
+  box-shadow: none;
+  transition: var(--hover-transition);
+}
+
+.close-button:hover {
+  color: #ffffff;
+  background-color: var(--accent-hover);
+}
+
+.close-button:active {
+  background-color: var(--accent);
+}
+
+.notification-alt-actions {
+  padding: 4px;
+  background: transparent;
+  border-bottom-left-radius: var(--border-radius);
+  border-bottom-right-radius: var(--border-radius);
+}
+
+.notification-action {
+  margin: 3px;
+  padding: 0;
+}
+
+.notification-action > button {
+  min-height: 30px;
+  padding: 4px 12px;
+  color: var(--text-color);
+  background-color: var(--surface);
+  border: none;
+  border-radius: 999px;
+  box-shadow: none;
+  transition: var(--hover-transition);
+}
+
+.notification-action > button:hover {
+  color: #ffffff;
+  background-color: var(--accent-hover);
+}
+
+.notification-action > button:active {
+  background-color: var(--accent);
+}
+
+.notification-group-headers,
+.notification-group-buttons {
+  color: var(--text-color-secondary);
+  margin: 2px 14px;
+}
+
+.notification-group-header {
+  color: var(--text-color-secondary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.notification-group-icon {
+  color: var(--accent);
+  -gtk-icon-size: var(--notification-group-icon-size);
+}
+
+.notification-group.collapsed.not-expanded {
+  opacity: 0.55;
+}
+
+/* --------------------------------------------------------------------------
+ * Inline reply and progress
+ * -------------------------------------------------------------------------- */
+
+.inline-reply {
+  margin-top: 6px;
+}
+
+.inline-reply-entry {
+  min-height: 30px;
+  padding: 3px 12px;
+  color: var(--text-color);
+  caret-color: var(--text-color);
+  background: var(--noti-bg-darker);
+  border: var(--border);
+  border-radius: 999px;
+}
+
+.inline-reply-entry:focus {
+  border-color: var(--accent);
+}
+
+.inline-reply-button {
+  min-width: 34px;
+  min-height: 30px;
+  margin-left: 5px;
+  color: #ffffff;
+  background-color: var(--accent);
+  border: none;
+  border-radius: 999px;
+  box-shadow: none;
+  transition: var(--hover-transition);
+}
+
+.inline-reply-button:hover {
+  background-color: var(--accent-hover);
+}
+
+.inline-reply-button:disabled {
+  color: var(--text-color-disabled);
+  background-color: var(--surface);
+}
+
+progressbar {
+  margin-top: 5px;
+}
+
+progressbar trough {
+  min-height: 5px;
+  background: rgba(255, 255, 255, 0.10);
+  border-radius: 999px;
+}
+
+progressbar progress {
+  min-height: 5px;
+  background: var(--accent);
+  border-radius: 999px;
+}
+
+/* --------------------------------------------------------------------------
+ * Scrollbars
+ * -------------------------------------------------------------------------- */
+
+scrollbar,
+scrollbar.vertical {
+  min-width: 8px;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+}
+
+scrollbar trough,
+scrollbar.vertical trough {
+  min-width: 8px;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+}
+
+scrollbar slider,
+scrollbar.vertical slider {
+  min-width: 4px;
+  min-height: 36px;
+  margin: 2px;
+  padding: 0;
+  background-color: rgba(255, 255, 255, 0.16);
+  border: none;
+  border-radius: 999px;
+  box-shadow: none;
+  transition: background-color 150ms ease-in-out;
+}
+
+scrollbar slider:hover,
+scrollbar.vertical slider:hover {
+  background-color: rgba(139, 92, 246, 0.58);
+}
+
+scrollbar slider:active,
+scrollbar.vertical slider:active {
+  background-color: var(--accent);
+}
+
+undershoot.top,
+undershoot.bottom,
+overshoot.top,
+overshoot.bottom {
+  background: none;
+}
+
+selection {
+  color: #ffffff;
+  background: var(--accent);
+}
