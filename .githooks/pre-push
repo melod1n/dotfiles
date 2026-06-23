@@ -1,13 +1,20 @@
 #!/usr/bin/env bash
+
 set -euo pipefail
 
-echo "==> Running pre-push checks..."
+cd "$(git rev-parse --show-toplevel)"
 
-if command -v gitleaks >/dev/null 2>&1; then
-    echo "==> Scanning repository for secrets..."
-    gitleaks detect --source . --verbose
-else
-    echo "WARN: gitleaks is not installed, skipping secret scan"
+shopt -s nullglob
+
+shell_files=(
+  dot_local/bin/*
+  dot_config/hypr/notify/*.sh
+)
+
+if ((${#shell_files[@]} > 0)); then
+  shellcheck --check-sourced "${shell_files[@]}"
 fi
 
-echo "==> Done"
+gitleaks git \
+  --redact \
+  .

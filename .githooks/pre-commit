@@ -1,13 +1,37 @@
 #!/usr/bin/env bash
+
 set -euo pipefail
 
-echo "==> Running pre-commit checks..."
+cd "$(git rev-parse --show-toplevel)"
 
-if command -v gitleaks >/dev/null 2>&1; then
-    echo "==> Checking staged files for secrets..."
-    gitleaks protect --staged --verbose
-else
-    echo "WARN: gitleaks is not installed, skipping secret scan"
+mapfile -d '' staged_files < <(
+  git diff --cached --name-only --diff-filter=ACMR -z
+)
+
+shell_files=()
+
+for file in "${staged_files[@]}"; do
+  case "$file" in
+    dot_local/bin/*|dot_config/hypr/notify/*.sh)
+      shell_files+=("$file")
+      ;;
+  esac
+done
+
+if ((${#shell_files[@]} > 0)); then
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' EXIT
+
+  git checkout-index --all --prefix="$tmp/"
+
+  (
+    cd "$tmp"
+    shellcheck --check-sourced "${shell_files[@]}"
+  )
 fi
 
-echo "==> Done"
+gitleaks git \
+  --pre-commit \
+  --staged \
+  --redact \
+  .

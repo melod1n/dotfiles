@@ -8,18 +8,82 @@ on:
 jobs:
   shellcheck:
     runs-on: debian-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Install shellcheck
-        run: curl -L https://github.com/koalaman/shellcheck/releases/download/stable/shellcheck-stable.linux.x86_64.tar.xz -o shellcheck.tar.xz && tar -xJvf shellcheck.tar.xz && chmod +x ./shellcheck-stable/shellcheck
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install ShellCheck
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mkdir -p .ci/bin
+
+          curl -fsSL \
+            https://github.com/koalaman/shellcheck/releases/download/stable/shellcheck-stable.linux.x86_64.tar.xz \
+            -o /tmp/shellcheck.tar.xz
+
+          tar -xJf /tmp/shellcheck.tar.xz -C /tmp
+          install -m 0755 /tmp/shellcheck-stable/shellcheck .ci/bin/shellcheck
+
       - name: Lint shell scripts
-        run: ./shellcheck-stable/shellcheck dot_local/bin/* dot_config/hypr/notify/*.sh --check-sourced
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+
+          candidates=(
+            dot_local/bin/*
+            dot_config/hypr/notify/*.sh
+          )
+
+          scripts=()
+
+          for file in "${candidates[@]}"; do
+            [[ -f "$file" ]] && scripts+=("$file")
+          done
+
+          if (( ${#scripts[@]} == 0 )); then
+            echo "No shell scripts found"
+            exit 0
+          fi
+
+          printf 'Checking %s\n' "${scripts[@]}"
+          .ci/bin/shellcheck --check-sourced "${scripts[@]}"
 
   gitleaks:
     runs-on: debian-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: gitleaks/gitleaks-action@v4
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Gitleaks
+        shell: bash
         env:
-          GITHUB_TOKEN: ${{ secrets.GITEA_TOKEN }}
-          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+          GITLEAKS_VERSION: "8.30.1"
+        run: |
+          set -euo pipefail
+
+          mkdir -p .ci/bin
+
+          curl -fsSL \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
+            -o /tmp/gitleaks.tar.gz
+
+          tar -xzf /tmp/gitleaks.tar.gz -C .ci/bin gitleaks
+          chmod 0755 .ci/bin/gitleaks
+
+          .ci/bin/gitleaks version
+
+      - name: Scan repository for secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          .ci/bin/gitleaks git \
+            --redact \
+            --verbose \
+            .
