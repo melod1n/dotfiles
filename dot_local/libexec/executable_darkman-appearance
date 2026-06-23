@@ -1,0 +1,111 @@
+#!/usr/bin/env bash
+
+set -u
+set -o pipefail
+
+mode="${1:-}"
+
+case "$mode" in
+  light)
+    gtk_scheme="prefer-light"
+    gtk_theme="Breeze"
+    kde_scheme="BreezeLight"
+    qt_scheme="/usr/share/color-schemes/BreezeLight.colors"
+    icon_theme="breeze"
+    ;;
+  dark)
+    gtk_scheme="prefer-dark"
+    gtk_theme="Breeze-Dark"
+    kde_scheme="BreezeDark"
+    qt_scheme="/usr/share/color-schemes/BreezeDark.colors"
+    icon_theme="breeze-dark"
+    ;;
+  *)
+    printf 'Usage: %s light|dark\n' "$0" >&2
+    exit 2
+    ;;
+esac
+
+# Do not allow overlapping executions during rapid manual switching.
+lock_dir="${XDG_RUNTIME_DIR:-/tmp}"
+exec 9>"$lock_dir/darkman-appearance.lock"
+flock 9
+
+failed=0
+
+run() {
+  if ! "$@"; then
+    printf 'darkman-appearance: failed:' >&2
+    printf ' %q' "$@" >&2
+    printf '\n' >&2
+    failed=1
+  fi
+}
+
+# GTK3, GTK4 and libadwaita.
+run gsettings set \
+  org.gnome.desktop.interface \
+  color-scheme \
+  "$gtk_scheme"
+
+run gsettings set \
+  org.gnome.desktop.interface \
+  gtk-theme \
+  "$gtk_theme"
+
+# KDE Frameworks / KDE Qt applications.
+if command -v plasma-apply-colorscheme >/dev/null 2>&1; then
+  run plasma-apply-colorscheme "$kde_scheme"
+fi
+
+# plasma-apply-colorscheme does not switch the icon theme.
+if command -v kwriteconfig6 >/dev/null 2>&1; then
+  run kwriteconfig6 \
+    --file kdeglobals \
+    --group Icons \
+    --key Theme \
+    "$icon_theme"
+fi
+
+# GTK2.
+if [[ -f "$HOME/.gtkrc-2.0" ]]; then
+  if grep -qE '^[[:space:]]*gtk-theme-name[[:space:]]*=' \
+    "$HOME/.gtkrc-2.0"
+  then
+    run sed -i -E \
+      "s|^[[:space:]]*gtk-theme-name[[:space:]]*=.*$|gtk-theme-name=\"$gtk_theme\"|" \
+      "$HOME/.gtkrc-2.0"
+  else
+    printf '\ngtk-theme-name="%s"\n' "$gtk_theme" \
+      >> "$HOME/.gtkrc-2.0" || failed=1
+  fi
+fi
+
+# Qt6 / hyprqt6engine color scheme.
+qt_link="$HOME/.local/share/color-schemes/Darkman.colors"
+mkdir -p "$(dirname "$qt_link")"
+run ln -sfn "$qt_scheme" "$qt_link"
+
+# Qt6 / hyprqt6engine icon theme.
+hyprqt_config="$HOME/.config/hypr/hyprqt6engine.conf"
+if [[ -f "$hyprqt_config" ]]; then
+  if grep -qE '^[[:space:]]*icon_theme[[:space:]]*=' "$hyprqt_config"; then
+    run sed -i -E \
+      "s|^([[:space:]]*)icon_theme[[:space:]]*=.*$|\1icon_theme = $icon_theme|" \
+      "$hyprqt_config"
+  else
+    printf 'darkman-appearance: icon_theme is missing in %s\n' \
+      "$hyprqt_config" >&2
+    failed=1
+  fi
+fi
+
+# The KDE file chooser lives in this long-running process and reads its
+# palette at startup. Reset a previous start-limit failure, then restart it
+# only after KDE and Qt configuration has been written.
+kde_portal_unit="plasma-xdg-desktop-portal-kde.service"
+run systemctl --user reset-failed "$kde_portal_unit"
+run systemctl --user restart "$kde_portal_unit"
+
+printf 'darkman-appearance: applied %s\n' "$mode"
+exit "$failed"

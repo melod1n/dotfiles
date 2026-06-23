@@ -75,6 +75,9 @@
     "tooltip": true,
     "on-click": "swaync-client -t -sw",
     "on-click-right": "playerctl play-pause",
+    "on-scroll-up": "playerctld shift",
+    "on-scroll-down": "playerctld unshift",
+    // "interval": 1,
     "player-icons": {
       "default": "  ",
       "brave": "󰖟",
