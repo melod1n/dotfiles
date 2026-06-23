@@ -1,0 +1,281 @@
+#!/usr/bin/env python3
+
+from __future__ import annotations
+
+import json
+import os
+import shutil
+import sys
+import tempfile
+from pathlib import Path
+
+
+def die(message: str) -> "NoReturn":
+    print(f"darkman-vscode-theme: {message}", file=sys.stderr)
+    raise SystemExit(1)
+
+
+def parse_json_string(text: str, start: int) -> tuple[str, int]:
+    if start >= len(text) or text[start] != '"':
+        raise ValueError("expected JSON string")
+
+    i = start + 1
+    escaped = False
+
+    while i < len(text):
+        char = text[i]
+
+        if escaped:
+            escaped = False
+        elif char == "\\":
+            escaped = True
+        elif char == '"':
+            raw = text[start:i + 1]
+            return json.loads(raw), i + 1
+
+        i += 1
+
+    raise ValueError("unterminated JSON string")
+
+
+def skip_ws_and_comments(text: str, start: int) -> int:
+    i = start
+
+    while i < len(text):
+        if text[i].isspace():
+            i += 1
+            continue
+
+        if text.startswith("//", i):
+            newline = text.find("\n", i + 2)
+            return len(text) if newline == -1 else skip_ws_and_comments(text, newline + 1)
+
+        if text.startswith("/*", i):
+            end = text.find("*/", i + 2)
+            return len(text) if end == -1 else skip_ws_and_comments(text, end + 2)
+
+        break
+
+    return i
+
+
+def find_top_level_string_property(
+    text: str,
+    wanted_key: str,
+) -> tuple[str, int, int] | None:
+    depth = 0
+    i = 0
+
+    while i < len(text):
+        if text.startswith("//", i):
+            newline = text.find("\n", i + 2)
+            i = len(text) if newline == -1 else newline + 1
+            continue
+
+        if text.startswith("/*", i):
+            end = text.find("*/", i + 2)
+            i = len(text) if end == -1 else end + 2
+            continue
+
+        char = text[i]
+
+        if char == '"':
+            value, end = parse_json_string(text, i)
+
+            if depth == 1 and value == wanted_key:
+                colon = skip_ws_and_comments(text, end)
+
+                if colon < len(text) and text[colon] == ":":
+                    value_start = skip_ws_and_comments(text, colon + 1)
+
+                    if value_start < len(text) and text[value_start] == '"':
+                        property_value, value_end = parse_json_string(text, value_start)
+                        return property_value, value_start, value_end
+
+            i = end
+            continue
+
+        if char == "{":
+            depth += 1
+        elif char == "}":
+            depth -= 1
+
+        i += 1
+
+    return None
+
+
+def replace_or_insert_string_property(text: str, key: str, value: str) -> str:
+    found = find_top_level_string_property(text, key)
+    encoded = json.dumps(value, ensure_ascii=False)
+
+    if found is not None:
+        _, start, end = found
+        return text[:start] + encoded + text[end:]
+
+    opening = skip_ws_and_comments(text, 0)
+
+    if opening >= len(text) or text[opening] != "{":
+        raise ValueError("settings.json root is not an object")
+
+    content_start = skip_ws_and_comments(text, opening + 1)
+    indentation = "    "
+
+    if content_start < len(text) and text[content_start] == "}":
+        insertion = f'\n{indentation}{json.dumps(key)}: {encoded}\n'
+    else:
+        insertion = f'\n{indentation}{json.dumps(key)}: {encoded},'
+
+    return text[:opening + 1] + insertion + text[opening + 1:]
+
+
+def replace_or_insert_bool_property(text: str, key: str, value: bool) -> str:
+    # First handle an existing boolean value with a small top-level scanner.
+    depth = 0
+    i = 0
+
+    while i < len(text):
+        if text.startswith("//", i):
+            newline = text.find("\n", i + 2)
+            i = len(text) if newline == -1 else newline + 1
+            continue
+
+        if text.startswith("/*", i):
+            end = text.find("*/", i + 2)
+            i = len(text) if end == -1 else end + 2
+            continue
+
+        char = text[i]
+
+        if char == '"':
+            parsed, end = parse_json_string(text, i)
+
+            if depth == 1 and parsed == key:
+                colon = skip_ws_and_comments(text, end)
+
+                if colon < len(text) and text[colon] == ":":
+                    value_start = skip_ws_and_comments(text, colon + 1)
+
+                    for literal in ("true", "false"):
+                        if text.startswith(literal, value_start):
+                            replacement = "true" if value else "false"
+                            return (
+                                text[:value_start]
+                                + replacement
+                                + text[value_start + len(literal):]
+                            )
+
+            i = end
+            continue
+
+        if char == "{":
+            depth += 1
+        elif char == "}":
+            depth -= 1
+
+        i += 1
+
+    opening = skip_ws_and_comments(text, 0)
+
+    if opening >= len(text) or text[opening] != "{":
+        raise ValueError("settings.json root is not an object")
+
+    content_start = skip_ws_and_comments(text, opening + 1)
+    indentation = "    "
+    encoded = "true" if value else "false"
+
+    if content_start < len(text) and text[content_start] == "}":
+        insertion = f'\n{indentation}{json.dumps(key)}: {encoded}\n'
+    else:
+        insertion = f'\n{indentation}{json.dumps(key)}: {encoded},'
+
+    return text[:opening + 1] + insertion + text[opening + 1:]
+
+
+def candidate_settings_files() -> list[Path]:
+    config = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
+
+    candidates = [
+        config / "Code" / "User" / "settings.json",
+        config / "Code - OSS" / "User" / "settings.json",
+        config / "VSCodium" / "User" / "settings.json",
+    ]
+
+    return [path for path in candidates if path.is_file()]
+
+
+def update_settings(path: Path, mode: str) -> None:
+    original = path.read_text(encoding="utf-8")
+
+    preferred_key = (
+        "workbench.preferredLightColorTheme"
+        if mode == "light"
+        else "workbench.preferredDarkColorTheme"
+    )
+
+    preferred = find_top_level_string_property(original, preferred_key)
+
+    if preferred is not None:
+        theme = preferred[0]
+    else:
+        theme = "Default Light Modern" if mode == "light" else "Default Dark Modern"
+
+    updated = replace_or_insert_bool_property(
+        original,
+        "window.autoDetectColorScheme",
+        False,
+    )
+    updated = replace_or_insert_string_property(
+        updated,
+        "workbench.colorTheme",
+        theme,
+    )
+
+    if updated == original:
+        print(f"darkman-vscode-theme: already {mode}: {path}")
+        return
+
+    backup = path.with_name(path.name + ".before-darkman-workaround")
+
+    if not backup.exists():
+        shutil.copy2(path, backup)
+
+    fd, temporary_name = tempfile.mkstemp(
+        prefix=path.name + ".",
+        suffix=".tmp",
+        dir=path.parent,
+    )
+
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as temporary:
+            temporary.write(updated)
+            temporary.flush()
+            os.fsync(temporary.fileno())
+
+        os.chmod(temporary_name, path.stat().st_mode)
+        os.replace(temporary_name, path)
+    finally:
+        try:
+            os.unlink(temporary_name)
+        except FileNotFoundError:
+            pass
+
+    print(f"darkman-vscode-theme: applied {mode} -> {theme}: {path}")
+
+
+def main() -> None:
+    if len(sys.argv) != 2 or sys.argv[1] not in {"light", "dark"}:
+        die(f"usage: {Path(sys.argv[0]).name} light|dark")
+
+    mode = sys.argv[1]
+    settings_files = candidate_settings_files()
+
+    if not settings_files:
+        die("VS Code settings.json was not found")
+
+    for path in settings_files:
+        update_settings(path, mode)
+
+
+if __name__ == "__main__":
+    main()
