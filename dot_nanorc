@@ -1,7 +1,7 @@
 include "/usr/share/nano/*.nanorc"
 set autoindent
 set constantshow
-set linenumbers
+#set linenumbers
 #set mouse
 set quickblank
 set regexp

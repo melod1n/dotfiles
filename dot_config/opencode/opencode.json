@@ -29,15 +29,6 @@
     "lsp": "allow"
   },
   "mcp": {
-    "thunderbird": {
-      "type": "local",
-      "command": [
-        "node",
-        "/Users/meloda/Workspace/thunderbird-mcp/mcp-bridge.cjs"
-      ],
-      "enabled": true,
-      "timeout": 30000
-    },
     "context7": {
       "type": "remote",
       "url": "https://mcp.context7.com/mcp",
@@ -58,13 +49,6 @@
       "enabled": true,
       "timeout": 10000
     },
-    "sentry": {
-      "type": "remote",
-      "url": "https://mcp.sentry.dev/mcp",
-      "oauth": {},
-      "enabled": false,
-      "timeout": 10000
-    },
     "playwright": {
       "type": "local",
       "command": [
@@ -72,14 +56,13 @@
         "-y",
         "@playwright/mcp@latest"
       ],
-      "enabled": false,
+      "enabled": true,
       "timeout": 30000
     }
   },
   "tools": {
     "context7_*": false,
     "gh_grep_*": false,
-    "sentry_*": false,
     "playwright_*": false
   },
   "agent": {

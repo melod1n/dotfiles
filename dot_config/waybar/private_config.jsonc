@@ -11,18 +11,19 @@
     "hyprland/window"
   ],
   "modules-center": [
+    "custom/notification",
     "clock",
     "custom/weather",
-    "custom/media"
+    "mpris"
   ],
   "modules-right": [
     "tray",
     "hyprland/language",
     "pulseaudio",
     // "network",
-    "custom/bluetooth",
+    // "custom/bluetooth",
     "battery",
-    "custom/info",
+    // "custom/info",
     "custom/power"
   ],
   "hyprland/workspaces": {
@@ -54,20 +55,7 @@
   "clock": {
     "timezone": "Europe/Moscow",
     "format": "{:%H:%M   %a %d.%m.%Y}",
-    "on-click": "~/.config/waybar/scripts/toggle-calendar.sh",
-    "on-click-right": "~/.config/waybar/scripts/toggle-calendar.sh",
-    "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
-    "calendar": {
-      "mode": "month",
-      "on-scroll": 1,
-      "format": {
-        "months": "<span color='#ffead3'><b>{}</b></span>",
-        "days": "<span color='#ecc6d9'><b>{}</b></span>",
-        "weeks": "<span color='#99ff99'><b>W{}</b></span>",
-        "weekdays": "<span color='#ffcc66'><b>{}</b></span>",
-        "today": "<span color='#ff6699'><b><u>{}</u></b></span>"
-      }
-    }
+    "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
   },
   "custom/media": {
     "exec": "~/.config/waybar/scripts/media.sh",
@@ -75,9 +63,44 @@
     "hide-empty-text": true,
     "tooltip-format": "{text}",
     "interval": 2,
-    "on-click": "playerctl play-pause",
+    "on-click": "swaync-client -t -sw",
+    "on-click-right": "playerctl play-pause",
     "on-scroll-up": "playerctl next",
     "on-scroll-down": "playerctl previous"
+  },
+  "mpris": {
+    "format": "<span size='10pt'>{player_icon}</span>",
+    "format-paused": "󰏤",
+    "title-len": 35,
+    "tooltip": true,
+    "on-click": "swaync-client -t -sw",
+    "on-click-right": "playerctl play-pause",
+    "player-icons": {
+      "default": "  ",
+      "brave": "󰖟",
+      "firefox": "󰈹",
+      "vlc": "󰕼"
+    }
+  },
+  "custom/notification": {
+    "tooltip": true,
+    "format": "<span size='12pt'>{icon}</span>",
+    "format-icons": {
+      "notification": "󱅫",
+      "none": "󰂜",
+      "dnd-notification": "󰂠",
+      "dnd-none": "󰪓",
+      "inhibited-notification": "󰂛",
+      "inhibited-none": "󰪑",
+      "dnd-inhibited-notification": "󰂛",
+      "dnd-inhibited-none": "󰪑"
+    },
+    "return-type": "json",
+    "exec-if": "which swaync-client",
+    "exec": "swaync-client -swb",
+    "on-click": "swaync-client -t -sw",
+    "on-click-right": "swaync-client -d -sw",
+    "escape": true
   },
   "custom/bluetooth": {
     "format": " ",
