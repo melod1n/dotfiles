@@ -3,4 +3,4 @@ set -euo pipefail
 
 NEW_THEME=$(darkman toggle)
 
-$HOME/.config/hypr/notify/notify.sh normal "Theme changed: $NEW_THEME"
+# $HOME/.config/hypr/notify/notify.sh normal "Theme changed: $NEW_THEME"
