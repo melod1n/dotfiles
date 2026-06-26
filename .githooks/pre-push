@@ -12,7 +12,11 @@ shell_files=(
 )
 
 if ((${#shell_files[@]} > 0)); then
-  shellcheck --check-sourced "${shell_files[@]}"
+  if command -v shellcheck >/dev/null 2>&1; then
+    shellcheck --check-sourced "${shell_files[@]}"
+  else
+    printf 'warning: shellcheck is not installed; skipping shell checks\n' >&2
+  fi
 fi
 
 gitleaks git \
