@@ -17,49 +17,48 @@ fuzzel_args=(
 
 choice="$(
     printf '%s\n' \
-    '  Lock' \
-    '󰍃  Logout' \
-    '󰤄  Suspend' \
-    '󰒲  Hibernate' \
-    '󰜉  Reboot' \
-    '  Shutdown' |
-    exec -a "$PROCESS_NAME" fuzzel --dmenu \
-    "${fuzzel_args[@]}"
-)"
+        '  Lock' \
+        '󰍃  Logout' \
+        '󰤄  Suspend' \
+        '󰒲  Hibernate' \
+        '󰜉  Reboot' \
+        '  Shutdown' |
+        exec -a "$PROCESS_NAME" fuzzel --dmenu "${fuzzel_args[@]}"
+)" || exit 0
 
 case "$choice" in
-    "Lock")
+    *"Lock")
         pidof hyprlock >/dev/null || hyprlock
-    ;;
-    
-    "Logout")
+        ;;
+
+    *"Logout")
         hyprshutdown \
-        --top-label "Logging out..."
-    ;;
-    
-    "Suspend")
+            --top-label "Logging out..."
+        ;;
+
+    *"Suspend")
         pidof hyprlock >/dev/null || hyprlock &
         sleep 1
         systemctl suspend
-    ;;
+        ;;
 
-    "Hibernate")
+    *"Hibernate")
         systemctl hibernate
         ;;
-    
-    "Reboot")
+
+    *"Reboot")
         hyprshutdown \
-        --top-label "Restarting..." \
-        --post-cmd "systemctl reboot"
-    ;;
-    
-    "Shutdown")
+            --top-label "Restarting..." \
+            --post-cmd "systemctl reboot"
+        ;;
+
+    *"Shutdown")
         hyprshutdown \
-        --top-label "Shutting down..." \
-        --post-cmd "systemctl poweroff"
-    ;;
-    
+            --top-label "Shutting down..." \
+            --post-cmd "systemctl poweroff"
+        ;;
+
     *)
         exit 0
-    ;;
+        ;;
 esac
