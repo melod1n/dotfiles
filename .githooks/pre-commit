@@ -19,15 +19,19 @@ for file in "${staged_files[@]}"; do
 done
 
 if ((${#shell_files[@]} > 0)); then
-  tmp="$(mktemp -d)"
-  trap 'rm -rf "$tmp"' EXIT
+  if command -v shellcheck >/dev/null 2>&1; then
+    tmp="$(mktemp -d)"
+    trap 'rm -rf "$tmp"' EXIT
 
-  git checkout-index --all --prefix="$tmp/"
+    git checkout-index --all --prefix="$tmp/"
 
-  (
-    cd "$tmp"
-    shellcheck --check-sourced "${shell_files[@]}"
-  )
+    (
+      cd "$tmp"
+      shellcheck --check-sourced "${shell_files[@]}"
+    )
+  else
+    printf 'warning: shellcheck is not installed; skipping shell checks\n' >&2
+  fi
 fi
 
 gitleaks git \
