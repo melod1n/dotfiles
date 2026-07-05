@@ -47,14 +47,13 @@
     "max-length": 30,
     "separate-outputs": true,
     "rewrite": {
-      "": "Desktop",
-      "^.* - Google Chrome$": "Google Chrome",
-      "^Google Chrome$": "Google Chrome"
+      "": "Desktop"
     }
   },
   "clock": {
     "timezone": "Europe/Moscow",
-    "format": "{:%H:%M   %a %d.%m.%Y}",
+    "format": "{:%a, %d.%m.%Y,  %H:%M}",
+    // "format": "{:%H:%M\n%a, %d.%m.%Y}",
     "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
   },
   "custom/media": {
@@ -119,7 +118,6 @@
     "exec-if": "ping -c 1 1.1.1.1 > /dev/null"
   },
   "hyprland/language": {
-    "keyboard-name": "gaming-keyboard",
     "format": "{}",
     "format-en": "🇺🇸",
     "format-ru": "🇷🇺",
