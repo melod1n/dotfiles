@@ -66,13 +66,10 @@
     "playwright_*": false
   },
   "agent": {
-    "Lead": {
+    "build": {
       "steps": 500
     },
-    "Build": {
-      "steps": 500
-    },
-    "Plan": {
+    "plan": {
       "steps": 500
     },
     "external-researcher": {
