@@ -2,7 +2,7 @@
 description: Implements focused code changes after research or architecture is clear
 mode: subagent
 temperature: 0.25
-steps: 500
+steps: 150
 permission:
   read: allow
   list: allow
@@ -11,6 +11,7 @@ permission:
   lsp: allow
   edit: ask
   bash: ask
+  task: deny
   webfetch: ask
   websearch: ask
 ---

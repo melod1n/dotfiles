@@ -354,10 +354,9 @@ async function parseAgentWriteCapability(
 		const permission = configData?.agent?.[agentName]?.permission ?? {}
 
 		const editDenied = isPermissionDenied(permission.edit)
-		const writeDenied = isPermissionDenied(permission.write)
 		const bashDenied = isPermissionDenied(permission.bash)
 
-		return { isReadOnly: editDenied && writeDenied && bashDenied }
+		return { isReadOnly: editDenied && bashDenied }
 	} catch (error) {
 		// Fail-safe: Config errors shouldn't block task calls
 		// Fail-loud: Log for observability

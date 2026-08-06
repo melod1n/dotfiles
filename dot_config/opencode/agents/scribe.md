@@ -1,6 +1,26 @@
 ---
 description: Human-facing content specialist for documentation and prose
 mode: subagent
+steps: 40
+permission:
+  read: allow
+  list: allow
+  glob: allow
+  grep: allow
+  edit:
+    "*": deny
+    "*.md": allow
+    "**/*.md": allow
+    "*.mdx": allow
+    "**/*.mdx": allow
+    "CHANGELOG*": allow
+    "**/CHANGELOG*": allow
+    "LICENSE*": allow
+    "**/LICENSE*": allow
+  bash: deny
+  task: deny
+  webfetch: ask
+  websearch: ask
 ---
 
 # Scribe Agent

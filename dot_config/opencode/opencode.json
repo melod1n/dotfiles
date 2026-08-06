@@ -23,6 +23,12 @@
     "grep": "allow",
     "list": "allow",
 
+    // MCP tools are opt-in per specialist agent
+    "context7_*": "deny",
+    "exa_*": "deny",
+    "gh_grep_*": "deny",
+    "playwright_*": "deny",
+
     // Interaction & Safety
     "question": "allow",
     "doom_loop": "ask",
@@ -39,10 +45,10 @@
       "timeout": 10000
     },
     "exa": {
-			"type": "remote",
-			"url": "https://mcp.exa.ai/mcp",
-			"enabled": true
-		},
+      "type": "remote",
+      "url": "https://mcp.exa.ai/mcp",
+      "enabled": true
+    },
     "gh_grep": {
       "type": "remote",
       "url": "https://mcp.grep.app",
@@ -54,72 +60,10 @@
       "command": [
         "npx",
         "-y",
-        "@playwright/mcp@latest"
+        "@playwright/mcp@0.0.78"
       ],
       "enabled": true,
       "timeout": 30000
-    }
-  },
-  "tools": {
-    "context7_*": false,
-    "gh_grep_*": false,
-    "playwright_*": false
-  },
-  "agent": {
-    "build": {
-      "steps": 500
-    },
-    "plan": {
-      "steps": 500
-    },
-    "external-researcher": {
-      "steps": 500,
-      "tools": {
-        "context7_*": true,
-        "gh_grep_*": true
-      }
-    },
-    "architect": {
-      "steps": 500,
-      "tools": {
-        "context7_*": true,
-        "gh_grep_*": true
-      }
-    },
-    "kotlin-android": {
-      "steps": 500,
-      "tools": {
-        "context7_*": true,
-        "gh_grep_*": true
-      }
-    },
-    "backend": {
-      "steps": 500,
-      "tools": {
-        "context7_*": true,
-        "gh_grep_*": true
-      }
-    },
-    "devops": {
-      "steps": 500,
-      "tools": {
-        "context7_*": true,
-        "gh_grep_*": true
-      }
-    },
-    "ui-tui": {
-      "steps": 500,
-      "tools": {
-        "context7_*": true,
-        "gh_grep_*": true,
-        "playwright_*": true
-      }
-    },
-    "tester": {
-      "steps": 500,
-      "tools": {
-        "playwright_*": true
-      }
     }
   },
   "watcher": {
@@ -147,7 +91,7 @@
   ],
   "plugin": [
     [
-      "opencode-models-discovery",
+      "opencode-models-discovery@1.2.0",
       {
         "providers": {
           "include": [
@@ -163,8 +107,7 @@
     ],
     "@tarquinen/opencode-dcp@3.1.3",
     "@franlol/opencode-md-table-formatter@0.0.6",
-    "@kirmad/askuserquestion",
-    "@slkiser/opencode-quota"
+    "@slkiser/opencode-quota@4.5.0"
   ],
   "disabled_providers": [],
   "provider": {
@@ -175,7 +118,7 @@
         "baseURL": "{env:LLAMA_CPP_URL}",
         "modelsDiscovery": {
           "enabled": true,
-          "endpoint": "/v1/models",
+          "endpoint": "/v1/models"
         }
       },
       "models": {}

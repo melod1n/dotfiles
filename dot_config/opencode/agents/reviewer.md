@@ -2,7 +2,7 @@
 description: Reviews diffs for bugs, regressions, architecture issues, security issues, and unnecessary changes
 mode: subagent
 temperature: 0.1
-steps: 500
+steps: 50
 permission:
   read: allow
   list: allow
@@ -10,7 +10,13 @@ permission:
   grep: allow
   lsp: allow
   edit: deny
-  bash: ask
+  bash:
+    "*": deny
+    "git diff*": allow
+    "git log*": allow
+    "git show*": allow
+    "git status*": allow
+  task: deny
   webfetch: deny
   websearch: deny
 ---

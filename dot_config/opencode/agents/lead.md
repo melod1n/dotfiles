@@ -2,11 +2,26 @@
 description: Orchestrates work, breaks tasks into subtasks, delegates to specialized agents, and keeps the main context clean
 mode: primary
 temperature: 0.2
-steps: 500
+steps: 150
 permission:
   edit: deny
-  bash: ask
-  task: allow
+  bash: deny
+  task:
+    "*": deny
+    architect: allow
+    backend: allow
+    code-researcher: allow
+    devops: allow
+    docs: allow
+    explore: allow
+    external-researcher: allow
+    implementer: allow
+    kotlin-android: allow
+    reviewer: allow
+    scout: allow
+    scribe: allow
+    security: allow
+    tester: allow
   webfetch: ask
   websearch: ask
 ---
@@ -31,7 +46,6 @@ Delegation rules:
 - Use reviewer for diff review.
 - Use tester for tests, reproduction steps, and verification.
 - Use security for secrets, auth, privacy, dangerous shell, injection, and supply-chain concerns.
-- Use ui-tui for terminal UI, keyboard navigation, focus, accessibility, and visual hierarchy.
 - Use kotlin-android for Kotlin, Android, Compose, KMP, Gradle, and mobile architecture.
 - Use backend for Ktor, Exposed, Postgres, APIs, migrations, and service architecture.
 - Use devops for Docker, CI, systemd, Linux, deployment, self-hosted services.

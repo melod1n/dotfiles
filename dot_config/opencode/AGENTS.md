@@ -9,48 +9,17 @@
 - Do not modify generated files unless the task explicitly requires it.
 - Do not hide failing tests or lint errors.
 - If verification cannot be run, explain exactly why and what should be run manually.
-
-## Kotlin / Android / Compose
-
-- Prefer idiomatic Kotlin.
-- Prefer small composable functions with clear state ownership.
-- Do not introduce global mutable state.
-- Keep UI state and domain state separate.
-- Preserve existing architecture unless the task explicitly asks to change it.
-- For Compose, avoid unnecessary recomposition and unstable state holders.
-- For Kotlin Multiplatform, do not add JVM-only APIs to commonMain.
-
-## Backend / Ktor
-
-- Keep route handlers thin.
-- Put business logic into services/use-cases.
-- Keep database access isolated.
-- Do not introduce blocking calls into coroutine-heavy code unless justified.
-- Prefer explicit transactions around database writes.
-
-## TypeScript / Telegram bots
-
-- Preserve existing command/callback structure.
-- Do not mix transport logic with business logic.
-- Validate external input.
-- Avoid broad `any` unless there is a clear boundary reason.
-
-## Shell / DevOps
-
-- Prefer POSIX-compatible shell where practical.
-- Make scripts idempotent.
-- Do not hardcode machine-specific absolute paths unless explicitly requested.
-- For Docker Compose changes, preserve existing networks, volumes, and service names unless requested.
+- Keep stack-specific conventions in the project-level `AGENTS.md` or a relevant specialist skill/agent.
 
 ## External documentation
 
-- When implementation depends on library/framework behavior, use `context7`.
+- When implementation depends on library/framework behavior, use `context7` through an agent that is explicitly allowed to access it.
 - Prefer official docs and current API references.
 - Do not guess current API signatures.
 
 ## Code examples
 
-- If official docs are unclear, use `gh_grep` to inspect real-world usage.
+- If official docs are unclear, use `gh_grep` through an agent that is explicitly allowed to access it.
 - Treat random GitHub examples as hints, not as authoritative sources.
 - Prefer official docs over examples.
 

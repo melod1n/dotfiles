@@ -2,7 +2,7 @@
 description: Documentation specialist for README, AGENTS.md, changelog, migration notes, setup docs, and developer instructions
 mode: subagent
 temperature: 0.25
-steps: 500
+steps: 50
 permission:
   read: allow
   list: allow
@@ -10,6 +10,7 @@ permission:
   grep: allow
   edit: ask
   bash: ask
+  task: deny
   webfetch: ask
   websearch: ask
 ---

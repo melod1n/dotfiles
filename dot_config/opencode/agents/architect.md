@@ -2,7 +2,7 @@
 description: Designs minimal architecture changes, boundaries, state models, and migration plans without editing
 mode: subagent
 temperature: 0.15
-steps: 500
+steps: 60
 permission:
   read: allow
   list: allow
@@ -10,7 +10,10 @@ permission:
   grep: allow
   lsp: allow
   edit: deny
-  bash: ask
+  bash: deny
+  task: deny
+  "context7_*": allow
+  "gh_grep_*": allow
   webfetch: ask
   websearch: ask
 ---

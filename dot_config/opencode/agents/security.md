@@ -2,14 +2,15 @@
 description: Reviews security, secrets, auth, permissions, input validation, dangerous shell commands, and supply-chain risks
 mode: subagent
 temperature: 0.1
-steps: 500
+steps: 50
 permission:
   read: allow
   list: allow
   glob: allow
   grep: allow
   edit: deny
-  bash: ask
+  bash: deny
+  task: deny
   webfetch: ask
   websearch: ask
 ---

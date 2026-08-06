@@ -2,14 +2,18 @@
 description: Read-only external researcher for official docs, upstream source, dependency behavior, and current tool behavior
 mode: subagent
 temperature: 0.1
-steps: 500
+steps: 60
 permission:
   read: allow
   list: allow
   glob: allow
   grep: allow
   edit: deny
-  bash: ask
+  bash: deny
+  task: deny
+  "context7_*": allow
+  "exa_*": allow
+  "gh_grep_*": allow
   webfetch: ask
   websearch: ask
 ---

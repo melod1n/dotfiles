@@ -2,7 +2,7 @@
 description: Read-only local codebase researcher for finding files, call sites, patterns, and existing architecture
 mode: subagent
 temperature: 0.1
-steps: 500
+steps: 50
 permission:
   read: allow
   list: allow
@@ -10,7 +10,8 @@ permission:
   grep: allow
   lsp: allow
   edit: deny
-  bash: ask
+  bash: deny
+  task: deny
   webfetch: deny
   websearch: deny
 ---

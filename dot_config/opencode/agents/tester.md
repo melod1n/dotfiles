@@ -2,7 +2,7 @@
 description: Designs and runs verification steps, tests, reproduction scenarios, and regression checks
 mode: subagent
 temperature: 0.1
-steps: 500
+steps: 100
 permission:
   read: allow
   list: allow
@@ -11,6 +11,8 @@ permission:
   lsp: allow
   edit: ask
   bash: ask
+  task: deny
+  "playwright_*": allow
   webfetch: deny
   websearch: deny
 ---
