@@ -61,11 +61,16 @@ start_border() {
     rm -f "$BORDER_PIDFILE"
 
     local border_cmd="$HOME/.config/hypr/scripts/recording-border.py $bw $bh $BORDER_SIZE $BORDER_PIDFILE $BORDER_COLOR"
-
-    # В актуальном Hyprland правила передаются внутри квадратных скобок [ RULES ].
-    # Разделитель правил — точка с запятой (;). 
-    # Включаем float, pin, отключаем фокус, анимации, блюр, тени, задаем точный размер и позицию.
-    hyprctl dispatch exec "[float; pin; nofocus; noanim; noblur; noshadow; move $bx $by; size $bw $bh]" "$border_cmd" >/dev/null
+    hyprctl dispatch "hl.dsp.exec_cmd([==[$border_cmd]==], {
+    float = true,
+    pin = true,
+    no_focus = true,
+    no_anim = true,
+    no_blur = true,
+    no_shadow = true,
+    move = { $bx, $by },
+    size = { $bw, $bh },
+})" >/dev/null    
 }
 
 if is_recording; then

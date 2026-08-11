@@ -1,0 +1,20 @@
+hl.config({
+    input = {
+        kb_layout = "us,ru",
+        kb_variant = "",
+        kb_model = "",
+        kb_options = "grp:win_space_toggle",
+        kb_rules = "",
+
+        repeat_delay = 300,
+        repeat_rate = 25,
+
+        follow_mouse = 1,
+        float_switch_override_focus = 0,
+        mouse_refocus = false,
+
+        accel_profile = "flat",
+        sensitivity = 0,
+        force_no_accel = true,
+    },
+})
