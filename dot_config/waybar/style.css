@@ -9,7 +9,8 @@
 }
 
 window#waybar {
-  background: transparent;
+  background: rgba(0, 0, 0, 0);
+  border-radius: 24px;
   color: #e6e6f0;
 }
 
@@ -70,8 +71,7 @@ window#waybar {
 
 #clock,
 #custom-media,
-#mpris,
-#custom-notification {
+#mpris {
   background: #8b5cf6;
   transition: background 0.15s ease-in-out;
 }
@@ -86,10 +86,10 @@ window#waybar {
   background: rgba(255, 255, 255, 0.075);
   color: #e6e6f0;
   border-radius: 999px;
-  /* padding: 3px 10px; */
   margin: 0;
-  min-width: 48px;
-  padding: 0 4px 0 0;
+  min-width: 24px;
+  padding: 0 15px 0 24px;
+  transition: background 0.15s ease-in-out;
 }
 
 #tray {
@@ -111,5 +111,10 @@ window#waybar {
   min-width: 20px;
   background: #db5a5a;
   color: white;
-  padding: 6px 24px 8px 20px;
+  padding: 6px 13px 8px 20px;
+  transition: background 0.15s ease-in-out;
+}
+
+#custom-power:hover {
+  background: #a33c3c;
 }
