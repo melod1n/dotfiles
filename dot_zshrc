@@ -229,10 +229,6 @@ alias explorer='dolphin '
 alias cf=': > '
 
 case "$OS" in
-  Darwin)
-    alias emulator='QT_QPA_PLATFORM=xcb "$ANDROID_HOME"/emulator/emulator '
-    ;;
-
   Linux)
     alias emulator='QT_QPA_PLATFORM=xcb ~/Android/Sdk/emulator/emulator '
 
