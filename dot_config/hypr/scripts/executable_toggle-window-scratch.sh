@@ -3,7 +3,7 @@ SPECIAL="special:scratch"
 CURRENT_WS=$(hyprctl activewindow -j | jq -r '.workspace.name')
 
 if [ "$CURRENT_WS" == "$SPECIAL" ]; then
-    hyprctl dispatch movetoworkspace +0
+    hyprctl dispatch 'hl.dsp.window.move({ workspace = "+0" })'
 else
-    hyprctl dispatch movetoworkspace $SPECIAL
+    hyprctl dispatch "hl.dsp.window.move({ workspace = \"$SPECIAL\" })"
 fi
