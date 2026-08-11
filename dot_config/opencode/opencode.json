@@ -60,7 +60,9 @@
       "command": [
         "npx",
         "-y",
-        "@playwright/mcp@0.0.78"
+        "@playwright/mcp@0.0.78",
+        "--executable-path",
+        "/usr/bin/chromium"
       ],
       "enabled": true,
       "timeout": 30000
@@ -90,21 +92,7 @@
     "./tools/philosophy.md"
   ],
   "plugin": [
-    [
-      "opencode-models-discovery@1.2.0",
-      {
-        "providers": {
-          "include": [
-            "llama.cpp"
-          ]
-        },
-        "discovery": {
-          "enabled": true,
-          "ttl": 15000
-        },
-        "smartModelName": true
-      }
-    ],
+    "opencode-models-discovery@1.2.0",
     "@tarquinen/opencode-dcp@3.1.3",
     "@franlol/opencode-md-table-formatter@0.0.6",
     "@slkiser/opencode-quota@4.5.0"
@@ -118,7 +106,8 @@
         "baseURL": "{env:LLAMA_CPP_URL}",
         "modelsDiscovery": {
           "enabled": true,
-          "endpoint": "/v1/models"
+          "endpoint": "/v1/models",
+          "smartModelName": true
         }
       },
       "models": {}
