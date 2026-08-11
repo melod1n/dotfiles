@@ -161,6 +161,13 @@ hl.window_rule({
 })
 
 hl.window_rule({
+    name = "flclashx",
+    match = { class = "com.follow.clashx" },
+    float = true,
+    size = { 380, 720 },
+})
+
+hl.window_rule({
     name = "kde-picker",
     match = { class = "org.freedesktop.impl.portal.desktop.kde" },
     size = { 1000, 640 },
