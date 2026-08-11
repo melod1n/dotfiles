@@ -8,7 +8,7 @@ hl.config({
         group_on_movetoworkspace = false,
 
         groupbar = {
-            enabled = true,
+            enabled = false,
         },
     },
 })
