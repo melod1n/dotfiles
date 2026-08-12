@@ -9,7 +9,7 @@ hl.config({
         repeat_delay = 300,
         repeat_rate = 25,
 
-        follow_mouse = 1,
+        follow_mouse = 2,
         float_switch_override_focus = 0,
         mouse_refocus = true,
 
