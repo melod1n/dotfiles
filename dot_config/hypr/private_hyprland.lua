@@ -18,6 +18,3 @@ require("./conf.d/42-binds-workspaces")
 require("./conf.d/43-binds-screenshots")
 require("./conf.d/46-binds-media")
 require("./conf.d/90-misc")
-
--- HyprMod managed settings
-require("hyprland-gui")
