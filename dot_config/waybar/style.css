@@ -9,24 +9,24 @@
 }
 
 window#waybar {
-  background: rgba(0, 0, 0, 0);
-  border-radius: 24px;
+  /* background: rgba(0, 0, 0, 0); */
+  /* border-radius: 24px;s */
   color: #e6e6f0;
 }
 
 .modules-left,
 .modules-center,
 .modules-right {
-  background: rgba(17, 17, 27, 0.82);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 24px;
+  /* background: rgba(17, 17, 27, 0.82); */
+  /* border: 1px solid rgba(255, 255, 255, 0.08); */
+  /* border-radius: 24px; */
   padding: 4px 4px;
 }
 
 #workspaces button {
-  background: rgba(17, 17, 27, 0.82);
+  /* background: rgba(17, 17, 27, 0.82); */
   color: #8f8fa3;
-  border-radius: 999px;
+  /* border-radius: 999px; */
   padding: 6px 14px;
   margin: 0 2px;
   transition: all 0.25s ease-in-out;
@@ -41,6 +41,8 @@ window#waybar {
   color: #c9c9d8;
   padding: 0 10px 0 4px;
   margin: 0;
+  background: rgba(255, 255, 255, 0.075);
+  border-radius: 6px;
 }
 
 #clock,
@@ -59,11 +61,10 @@ window#waybar {
 #custom-power,
 #custom-theme,
 #custom-info,
-#window,
 #mpris {
   background: rgba(255, 255, 255, 0.075);
   color: #e6e6f0;
-  border-radius: 999px;
+  border-radius: 6px;
   padding: 3px 10px;
   margin: 0;
   min-width: 16px;
@@ -85,7 +86,7 @@ window#waybar {
 #custom-notification {
   background: rgba(255, 255, 255, 0.075);
   color: #e6e6f0;
-  border-radius: 999px;
+  border-radius: 6px;
   margin: 0;
   min-width: 24px;
   padding: 0 15px 0 24px;
